@@ -27,31 +27,32 @@ import Breadcrumb from "../../../../components/BreadCrumb";
 import PageTitle from "../../../../components/PageTitle";
 import theme from "../../../../theme";
 import SearchBar from "../../../../components/SearchBar";
+import { getSalesType, getSalesTypes } from "../../../../api/SalesMaintenance/salesService";
 
 // Mock API function for Sales Types
-const getSalesTypesList = async () => [
-    {
-        id: 1,
-        typeName: "Retail",
-        factor: 1.0,
-        taxIncl: true,
-        status: "Active",
-    },
-    {
-        id: 2,
-        typeName: "Wholesale",
-        factor: 0.9,
-        taxIncl: false,
-        status: "Inactive",
-    },
-    {
-        id: 3,
-        typeName: "Export",
-        factor: 1.2,
-        taxIncl: true,
-        status: "Active",
-    },
-];
+// const getSalesTypesList = async () => [
+//     {
+//         id: 1,
+//         typeName: "Retail",
+//         factor: 1.0,
+//         taxIncl: true,
+//         status: "Active",
+//     },
+//     {
+//         id: 2,
+//         typeName: "Wholesale",
+//         factor: 0.9,
+//         taxIncl: false,
+//         status: "Inactive",
+//     },
+//     {
+//         id: 3,
+//         typeName: "Export",
+//         factor: 1.2,
+//         taxIncl: true,
+//         status: "Active",
+//     },
+// ];
 
 function SalesTypesTable() {
     const [page, setPage] = useState(0);
@@ -63,7 +64,7 @@ function SalesTypesTable() {
 
     const { data: salesTypesData = [] } = useQuery({
         queryKey: ["salesTypes"],
-        queryFn: getSalesTypesList,
+        queryFn: getSalesTypes,
     });
 
     // Filter with search + inactive toggle

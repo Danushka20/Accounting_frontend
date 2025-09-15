@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Stack,
@@ -11,7 +11,9 @@ import {
   useTheme,
   useMediaQuery,
 } from "@mui/material";
+import { useParams } from "react-router-dom";
 import theme from "../../../../theme";
+import { getSalesType, updateSalesType, SalesType } from "../../../../api/SalesMaintenance/salesService";
 
 interface SalesTypeFormData {
   salesTypeName: string;
@@ -20,6 +22,7 @@ interface SalesTypeFormData {
 }
 
 export default function UpdateSalesTypesForm() {
+  const { id } = useParams<{ id: string }>();
   const [formData, setFormData] = useState<SalesTypeFormData>({
     salesTypeName: "",
     calculationFactor: "",
@@ -31,6 +34,23 @@ export default function UpdateSalesTypesForm() {
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
 
+  // Load existing sales type data
+  useEffect(() => {
+    if (!id) return;
+    getSalesType(Number(id))
+      .then((res: SalesType) => {
+        setFormData({
+          salesTypeName: res.typeName,
+          calculationFactor: res.factor.toString(),
+          taxIncluded: res.taxIncl,
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+        alert("Failed to load sales type data");
+      });
+  }, [id]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setFormData({
@@ -41,27 +61,36 @@ export default function UpdateSalesTypesForm() {
 
   const validate = () => {
     const newErrors: Partial<SalesTypeFormData> = {};
-
     if (!formData.salesTypeName) newErrors.salesTypeName = "Sales Type Name is required";
     if (!formData.calculationFactor) {
       newErrors.calculationFactor = "Calculation Factor is required";
     } else if (isNaN(Number(formData.calculationFactor))) {
       newErrors.calculationFactor = "Calculation Factor must be a number";
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!id) return;
     if (validate()) {
-      console.log("Submitted Data:", formData);
-      alert("Sales Type Updated successfully!");
+      try {
+        await updateSalesType(Number(id), {
+          typeName: formData.salesTypeName,
+          factor: Number(formData.calculationFactor),
+          taxIncl: formData.taxIncluded,
+        });
+        alert("Sales Type updated successfully!");
+        window.history.back();
+      } catch (error) {
+        console.error(error);
+        alert("Failed to update Sales Type");
+      }
     }
   };
 
   return (
-    <Stack alignItems="center" sx={{ mt: 4, px: isMobile ? 2 : 0  }}>
+    <Stack alignItems="center" sx={{ mt: 4, px: isMobile ? 2 : 0 }}>
       <Paper
         sx={{
           p: theme.spacing(3),
@@ -110,12 +139,20 @@ export default function UpdateSalesTypesForm() {
           />
         </Stack>
 
-        <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3,flexDirection: isMobile ? "column" : "row",gap: isMobile ? 2 : 0, }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: isMobile ? "column" : "row",
+            justifyContent: "space-between",
+            mt: 3,
+            gap: isMobile ? 2 : 0,
+          }}
+        >
           <Button onClick={() => window.history.back()}>Back</Button>
 
           <Button
             variant="contained"
-             fullWidth={isMobile}
+            fullWidth={isMobile}
             sx={{ backgroundColor: "var(--pallet-blue)" }}
             onClick={handleSubmit}
           >

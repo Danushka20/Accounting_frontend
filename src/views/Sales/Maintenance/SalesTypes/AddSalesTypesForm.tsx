@@ -12,6 +12,7 @@ import {
   useTheme,
 } from "@mui/material";
 import theme from "../../../../theme";
+import { createSalesType } from "../../../../api/SalesMaintenance/salesService";
 
 interface SalesTypeFormData {
   salesTypeName: string;
@@ -53,12 +54,22 @@ export default function AddSalesTypesForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validate()) {
-      console.log("Submitted Data:", formData);
-      alert("Sales Type added successfully!");
+      try {
+        await createSalesType({
+          typeName: formData.salesTypeName,
+          factor: Number(formData.calculationFactor),
+          taxIncl: formData.taxIncluded,
+        });
+        alert("Sales Type added successfully!");
+        window.history.back();
+      } catch (error) {
+        console.error(error);
+        alert("Failed to add Sales Type");
+      }
     }
-  };
+};
 
   return (
     <Stack alignItems="center" sx={{ mt: 4, px: isMobile ? 2 : 0 }}>
