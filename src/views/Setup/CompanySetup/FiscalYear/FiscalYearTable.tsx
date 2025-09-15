@@ -25,18 +25,7 @@ import theme from "../../../../theme";
 import Breadcrumb from "../../../../components/BreadCrumb";
 import PageTitle from "../../../../components/PageTitle";
 import SearchBar from "../../../../components/SearchBar";
-
-const getFiscalYears = async () => [
-  { id: 1, fiscalYearBegin: "2025-01-01", fiscalYearEnd: "2025-12-31", isClosed: false },
-  { id: 2, fiscalYearBegin: "2024-01-01", fiscalYearEnd: "2024-12-31", isClosed: true },
-  { id: 3, fiscalYearBegin: "2023-01-01", fiscalYearEnd: "2023-12-31", isClosed: true },
-  { id: 4, fiscalYearBegin: "2025-01-01", fiscalYearEnd: "2025-12-31", isClosed: false },
-  { id: 5, fiscalYearBegin: "2024-01-01", fiscalYearEnd: "2024-12-31", isClosed: true },
-  { id: 6, fiscalYearBegin: "2023-01-01", fiscalYearEnd: "2023-12-31", isClosed: true },
-  { id: 7, fiscalYearBegin: "2025-01-01", fiscalYearEnd: "2025-12-31", isClosed: false },
-  { id: 8, fiscalYearBegin: "2024-01-01", fiscalYearEnd: "2024-12-31", isClosed: true },
-  { id: 9, fiscalYearBegin: "2023-01-01", fiscalYearEnd: "2023-12-31", isClosed: true },
-];
+import { getFiscalYears, deleteFiscalYear } from "../../../../api/FiscalYear/FiscalYearApi";
 
 function FiscalYearTable() {
   const [page, setPage] = useState(0);
@@ -45,19 +34,25 @@ function FiscalYearTable() {
   const navigate = useNavigate();
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
 
-  const { data: fiscalYears = [], isFetching } = useQuery({
+  const { data: fiscalYears = [], refetch, isFetching } = useQuery({
     queryKey: ["fiscalYears"],
     queryFn: getFiscalYears,
   });
 
   const filteredData = useMemo(() => {
-    return fiscalYears.filter(
-      (fy) =>
-        fy.fiscalYearBegin.includes(searchQuery) ||
-        fy.fiscalYearEnd.includes(searchQuery) ||
-        (fy.isClosed ? "Yes" : "No").toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    return fiscalYears.filter((fy) => {
+      const begin = fy.fiscalYearBegin ?? "";
+      const end = fy.fiscalYearEnd ?? "";
+      const closed = fy.isClosed ? "yes" : "no";
+
+      return (
+        begin.includes(searchQuery) ||
+        end.includes(searchQuery) ||
+        closed.includes(searchQuery.toLowerCase())
+      );
+    });
   }, [fiscalYears, searchQuery]);
+
 
   const paginatedData = useMemo(() => {
     if (rowsPerPage === -1) return filteredData;
@@ -70,8 +65,17 @@ function FiscalYearTable() {
     setPage(0);
   };
 
-  const handleDelete = (id: number) => {
-    alert(`Delete fiscal year with id: ${id}`);
+  const handleDelete = async (id: number) => {
+    if (window.confirm("Are you sure you want to delete this fiscal year?")) {
+      try {
+        await deleteFiscalYear(id);
+        alert("Fiscal year deleted successfully!");
+        refetch();
+      } catch (err) {
+        console.error(err);
+        alert("Failed to delete fiscal year");
+      }
+    }
   };
 
   const breadcrumbItems = [
@@ -136,7 +140,6 @@ function FiscalYearTable() {
         </Box>
       </Box>
 
-
       <Stack sx={{ alignItems: "center" }}>
         <TableContainer
           component={Paper}
@@ -146,6 +149,7 @@ function FiscalYearTable() {
           <Table aria-label="fiscal years table">
             <TableHead sx={{ backgroundColor: "var(--pallet-lighter-blue)" }}>
               <TableRow>
+                <TableCell>No</TableCell>
                 <TableCell>Fiscal Year Begin</TableCell>
                 <TableCell>Fiscal Year End</TableCell>
                 <TableCell>Is Closed</TableCell>
@@ -155,10 +159,11 @@ function FiscalYearTable() {
 
             <TableBody>
               {paginatedData.length > 0 ? (
-                paginatedData.map((fy) => (
+                paginatedData.map((fy, index) => (
                   <TableRow key={fy.id} hover>
-                    <TableCell>{new Date(fy.fiscalYearBegin).toLocaleDateString()}</TableCell>
-                    <TableCell>{new Date(fy.fiscalYearEnd).toLocaleDateString()}</TableCell>
+                    <TableCell>{page * rowsPerPage + index + 1}</TableCell>
+                    <TableCell>{new Date(fy.fiscal_year_from).toLocaleDateString()}</TableCell>
+                    <TableCell>{new Date(fy.fiscal_year_to).toLocaleDateString()}</TableCell>
                     <TableCell>{fy.isClosed ? "Yes" : "No"}</TableCell>
                     <TableCell align="center">
                       <Stack direction="row" spacing={1} justifyContent="center">
@@ -166,7 +171,7 @@ function FiscalYearTable() {
                           variant="contained"
                           size="small"
                           startIcon={<EditIcon />}
-                          onClick={() => navigate("/setup/companysetup/update-fiscal-year/")}
+                          onClick={() => navigate(`/setup/companysetup/update-fiscal-year/${fy.id}`)}
                         >
                           Edit
                         </Button>
@@ -185,7 +190,7 @@ function FiscalYearTable() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={4} align="center">
+                  <TableCell colSpan={5} align="center">
                     <Typography variant="body2">
                       {isFetching ? "Loading..." : "No Records Found"}
                     </Typography>
@@ -198,7 +203,7 @@ function FiscalYearTable() {
               <TableRow>
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
-                  colSpan={4}
+                  colSpan={5}
                   count={filteredData.length}
                   rowsPerPage={rowsPerPage}
                   page={page}

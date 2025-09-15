@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Stack,
@@ -12,7 +12,9 @@ import {
   useTheme,
 } from "@mui/material";
 import theme from "../../../../theme";
-
+import { useQueryClient } from "@tanstack/react-query";
+import { getCurrency, updateCurrency } from "../../../../api/Currency/CurrencyApi";
+import { useNavigate, useParams } from "react-router";
 interface CurrenciesFormData {
   currencyAbbreviation: string;
   currencySymbol: string;
@@ -25,6 +27,9 @@ interface CurrenciesFormData {
 export default function UpdateCurrencies() {
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
+  const queryClient = useQueryClient();
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState<CurrenciesFormData>({
     currencyAbbreviation: "",
@@ -36,6 +41,21 @@ export default function UpdateCurrencies() {
   });
 
   const [errors, setErrors] = useState<Partial<CurrenciesFormData>>({});
+
+  useEffect(() => {
+    if (id) {
+      getCurrency(id).then((currency) => {
+        setFormData({
+          currencyAbbreviation: currency.currency_abbreviation,
+          currencySymbol: currency.currency_symbol,
+          currencyName: currency.currency_name,
+          hundredthsName: currency.hundredths_name,
+          country: currency.country,
+          autoExchangeRateUpdate: currency.auto_exchange_rate_update,
+        });
+      });
+    }
+  }, [id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -66,10 +86,28 @@ export default function UpdateCurrencies() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
-    if (validate()) {
-      console.log("Submitted Data:", formData);
-      alert("Form submitted successfully!");
+  const handleSubmit = async () => {
+    if (validate() && id) {
+      try {
+        const payload = {
+          currency_abbreviation: formData.currencyAbbreviation,
+          currency_symbol: formData.currencySymbol,
+          currency_name: formData.currencyName,
+          hundredths_name: formData.hundredthsName,
+          country: formData.country,
+          auto_exchange_rate_update: formData.autoExchangeRateUpdate,
+        };
+
+        const updatedCurrency = await updateCurrency(id, payload);
+        alert("Currency updated successfully!");
+        console.log("Updated currency:", updatedCurrency);
+
+        queryClient.invalidateQueries({ queryKey: ["currencies"] });
+        navigate("/bankingandgeneralledger/maintenance/currencies"); // change to your currency list route
+      } catch (err: any) {
+        console.error("Error updating currency:", err);
+        alert("Error updating currency: " + JSON.stringify(err));
+      }
     }
   };
 

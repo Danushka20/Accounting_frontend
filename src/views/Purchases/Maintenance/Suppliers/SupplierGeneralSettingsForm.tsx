@@ -15,6 +15,7 @@ import {
   Grid,
 } from "@mui/material";
 import theme from "../../../../theme";
+import { createSupplier } from "../../../../api/Supplier/SupplierApi";
 
 export default function SupplierGeneralSettingsForm() {
   const [formData, setFormData] = useState({
@@ -48,7 +49,7 @@ export default function SupplierGeneralSettingsForm() {
 
   const handleChange = (field: string, value: string | boolean) => {
     setFormData({ ...formData, [field]: value });
-    setErrors({ ...errors, [field]: "" }); // Clear error on change
+    setErrors({ ...errors, [field]: "" });
   };
 
   const validate = () => {
@@ -95,10 +96,72 @@ export default function SupplierGeneralSettingsForm() {
     return Object.keys(tempErrors).length === 0;
   };
 
-  const handleSubmit = () => {
-    if (validate()) {
-      console.log("Form submitted:", formData);
-      alert("Supplier settings saved!");
+  const handleSubmit = async () => {
+    if (!validate()) {
+      alert("Please fix validation errors before submitting");
+      return;
+    }
+
+    try {
+      const payload = {
+        supplier_name: formData.supplierName,
+        supplier_short_name: formData.supplierShortName,
+        gst_number: formData.gstNumber,
+        website: formData.website,
+        supplier_currency: formData.supplierCurrency,
+        tax_group: formData.taxGroup,
+        our_customer_no: formData.ourCustomerNo,
+        bank_account: formData.bankAccount,
+        bank_name: formData.bankName,
+        credit_limit: formData.creditLimit,
+        payment_terms: formData.paymentTerms,
+        prices_include_tax: formData.pricesIncludeTax,
+        accounts_payable: formData.accountsPayable,
+        purchase_account: formData.purchaseAccount,
+        purchase_discount_account: formData.purchaseDiscountAccount,
+        contact_person: formData.contactPerson,
+        phone: formData.phone,
+        secondary_phone: formData.secondaryPhone,
+        fax: formData.fax,
+        email: formData.email,
+        document_language: formData.documentLanguage,
+        mailing_address: formData.mailingAddress,
+        physical_address: formData.physicalAddress,
+        general_notes: formData.generalNotes,
+      };
+
+      await createSupplier(payload);
+      alert("Supplier created successfully");
+
+      setFormData({
+        supplierName: "",
+        supplierShortName: "",
+        gstNumber: "",
+        website: "",
+        supplierCurrency: "",
+        taxGroup: "",
+        ourCustomerNo: "",
+        bankAccount: "",
+        bankName: "",
+        creditLimit: "",
+        paymentTerms: "",
+        pricesIncludeTax: false,
+        accountsPayable: "",
+        purchaseAccount: "",
+        purchaseDiscountAccount: "",
+        contactPerson: "",
+        phone: "",
+        secondaryPhone: "",
+        fax: "",
+        email: "",
+        documentLanguage: "",
+        mailingAddress: "",
+        physicalAddress: "",
+        generalNotes: "",
+      })
+    } catch (error: any) {
+      console.error("Error creating supplier:", error);
+      alert("Failed to save supplier. See console for details.");
     }
   };
 

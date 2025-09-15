@@ -11,6 +11,8 @@ import {
     useTheme,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
+import { useQueryClient } from "@tanstack/react-query";
+import { createFiscalYear } from "../../../../api/FiscalYear/FiscalYearApi";
 
 interface FiscalYearFormData {
     fiscalYearFrom: string;
@@ -20,6 +22,7 @@ interface FiscalYearFormData {
 export default function AddFiscalYear() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+    const queryClient = useQueryClient();
 
     const {
         control,
@@ -35,10 +38,23 @@ export default function AddFiscalYear() {
 
     const fiscalYearFrom = watch("fiscalYearFrom");
 
-    const onSubmit = (data: FiscalYearFormData) => {
-        console.log("Submitted:", data);
-        alert("Fiscal Year submitted successfully!");
-    };
+    const onSubmit = async (data: FiscalYearFormData) => {
+    try {
+      const response = await createFiscalYear({
+        fiscal_year_from: data.fiscalYearFrom,
+        fiscal_year_to: data.fiscalYearTo,
+      });
+      console.log("Fiscal Year created:", response);
+      alert("Fiscal Year added successfully!");
+
+      // Refresh react-query cache if you have a list
+      queryClient.invalidateQueries({ queryKey: ["fiscal-years"] });
+      queryClient.refetchQueries({ queryKey: ["fiscal-years"] });
+    } catch (err: any) {
+      alert("Error creating Fiscal Year: " + JSON.stringify(err));
+    }
+  };
+
 
     return (
         <Stack alignItems="center" sx={{ mt: 4, px: 2 }}>

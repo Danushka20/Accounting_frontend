@@ -12,6 +12,8 @@ import {
   useTheme,
 } from "@mui/material";
 import theme from "../../../../theme";
+import { createCurrency } from "../../../../api/Currency/CurrencyApi";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface CurrenciesFormData {
   currencyAbbreviation: string;
@@ -35,6 +37,7 @@ export default function AddCurrencies() {
   const [errors, setErrors] = useState<Partial<CurrenciesFormData>>({});
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
+  const queryClient = useQueryClient();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -65,10 +68,38 @@ export default function AddCurrencies() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+   const handleSubmit = async () => {
     if (validate()) {
-      console.log("Submitted Data:", formData);
-      alert("Form submitted successfully!");
+      try {
+        const payload = {
+          currency_abbreviation: formData.currencyAbbreviation,
+          currency_symbol: formData.currencySymbol,
+          currency_name: formData.currencyName,
+          hundredths_name: formData.hundredthsName,
+          country: formData.country,
+          auto_exchange_rate_update: formData.autoExchangeRateUpdate,
+        };
+
+        const currency = await createCurrency(payload);
+        alert("Currency added successfully!");
+        console.log("Created currency:", currency);
+
+        // Refresh currency list if you have a query
+        queryClient.invalidateQueries({ queryKey: ["currencies"] });
+
+        // Optional: reset form
+        setFormData({
+          currencyAbbreviation: "",
+          currencySymbol: "",
+          currencyName: "",
+          hundredthsName: "",
+          country: "",
+          autoExchangeRateUpdate: false,
+        });
+        setErrors({});
+      } catch (err: any) {
+        alert("Error creating currency: " + JSON.stringify(err));
+      }
     }
   };
 

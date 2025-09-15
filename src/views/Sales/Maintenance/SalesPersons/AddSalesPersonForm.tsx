@@ -10,6 +10,8 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import theme from "../../../../theme";
+import { useQueryClient } from "@tanstack/react-query";
+import { createSalesPerson } from "../../../../api/SalesPerson/SalesPersonApi";
 
 interface SalesPersonFormData {
   name: string;
@@ -36,6 +38,7 @@ export default function AddSalesPerson() {
 
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
+  const queryClient = useQueryClient();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -65,10 +68,36 @@ export default function AddSalesPerson() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validate()) {
-      console.log("Submitted Sales Person Data:", formData);
-      alert("Sales person added successfully!");
+      try {
+        const payload = {
+          name: formData.name,
+          telephone: formData.telephone,
+          fax: formData.fax,
+          email: formData.email,
+          provision: formData.provision,
+          turnover_break_point: formData.turnoverBreakPoint,
+          provision2: formData.provision2
+        };
+
+        const salesPerson = await createSalesPerson(payload);
+        alert("Sales Person addes successfully")
+        queryClient.invalidateQueries({ queryKey: ["sales_people"] });
+
+        setFormData({
+          name: "",
+          telephone: "",
+          fax: "",
+          email: "",
+          provision: "",
+          turnoverBreakPoint: "",
+          provision2: "",
+        });
+        setErrors({});
+      } catch (err: any){
+        alert("Error creating sales person: " + JSON.stringify(err));
+      }
     }
   };
 

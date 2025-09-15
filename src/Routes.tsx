@@ -786,7 +786,7 @@ const AppRoutes = () => {
         element={withLayout(MainLayout, AddSalesPerson)}
       />
       <Route
-        path="/sales/maintenance/sales-persons/update-sales-person"
+        path="/sales/maintenance/sales-persons/update-sales-person/:id"
         element={withLayout(MainLayout, UpdateSalesPerson)}
       /><Route
         path="/sales/maintenance/sales-areas"
@@ -1000,7 +1000,7 @@ const AppRoutes = () => {
         element={withLayout(MainLayout, AddCurrencies)}
       />
       <Route
-        path="/bankingandgeneralledger/maintenance/update-currency"
+        path="/bankingandgeneralledger/maintenance/update-currency/:id"
         element={withLayout(MainLayout, UpdateCurrencies)}
       />
       <Route
@@ -1082,7 +1082,7 @@ const AppRoutes = () => {
         element={withLayout(MainLayout, AddFiscalYear)}
       />
       <Route
-        path="/setup/companysetup/update-fiscal-year"
+        path="/setup/companysetup/update-fiscal-year/:id"
         element={withLayout(MainLayout, UpdateFiscalYear)}
       />
       <Route
