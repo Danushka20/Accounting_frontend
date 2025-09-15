@@ -14,6 +14,7 @@ import {
   FormHelperText,
 } from "@mui/material";
 import theme from "../../../../theme";
+import { createCustomer } from "../../../../api/Customer/AddCustomerApi";
 
 export default function GeneralSettingsForm() {
   const [formData, setFormData] = useState({
@@ -21,8 +22,8 @@ export default function GeneralSettingsForm() {
     customerShortName: "",
     address: "",
     gstNumber: "",
-    currency: "USD",
-    salesType: "Retail",
+    currency: "",
+    salesType: "",
     phone: "",
     secondaryPhone: "",
     email: "",
@@ -31,8 +32,8 @@ export default function GeneralSettingsForm() {
     discountPercent: "",
     promptPaymentDiscount: "",
     creditLimit: "",
-    paymentTerms: "Cash Only",
-    creditStatus: "Good History",
+    paymentTerms: "",
+    creditStatus: "",
     generalNotes: "",
     defaultInventoryLocation: "",
     defaultShippingCompany: "",
@@ -45,7 +46,7 @@ export default function GeneralSettingsForm() {
   const handleChange = (field: string, value: string) => {
     setFormData({ ...formData, [field]: value });
     if (errors[field]) {
-      setErrors({ ...errors, [field]: "" }); // clear error on change
+      setErrors({ ...errors, [field]: "" }); 
     }
   };
 
@@ -125,13 +126,67 @@ export default function GeneralSettingsForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validate()) {
       alert("Please fix validation errors before submitting.");
       return;
     }
-    console.log("Form submitted:", formData);
-    alert("General settings saved!");
+
+    try {
+      const payload = {
+        customer_name: formData.customerName,
+        customer_short_name: formData.customerShortName,
+        address: formData.address,
+        gst_number: formData.gstNumber,
+        currency: formData.currency,
+        sales_type: formData.salesType,
+        phone: formData.phone,
+        secondary_phone: formData.secondaryPhone,
+        email: formData.email,
+        bank_account: formData.bankAccount,
+        sales_person: formData.salesPerson,
+        discount_percent: formData.discountPercent,
+        prompt_payment_discount: formData.promptPaymentDiscount,
+        credit_limit: formData.creditLimit,
+        payment_terms: formData.paymentTerms,
+        credit_status: formData.creditStatus,
+        general_notes: formData.generalNotes,
+        default_inventory_location: formData.defaultInventoryLocation,
+        default_shipping_company: formData.defaultShippingCompany,
+        sales_area: formData.salesArea,
+        tax_group: formData.taxGroup,
+      };
+
+      await createCustomer(payload);
+      alert("Customer created successfully");
+
+      setFormData({
+        customerName: "",
+        customerShortName: "",
+        address: "",
+        gstNumber: "",
+        currency: "",
+        salesType: "",
+        phone: "",
+        secondaryPhone: "",
+        email: "",
+        bankAccount: "",
+        salesPerson: "",
+        discountPercent: "",
+        promptPaymentDiscount: "",
+        creditLimit: "",
+        paymentTerms: "",
+        creditStatus: "",
+        generalNotes: "",
+        defaultInventoryLocation: "",
+        defaultShippingCompany: "",
+        salesArea: "",
+        taxGroup: "",
+      });
+    } catch (error: any) {
+      console.error("Error creating customer:", error);
+      alert("Failed to save customer. See console for details.");
+    }
   };
 
   return (

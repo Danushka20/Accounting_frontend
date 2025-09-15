@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
     Box,
     Stack,
@@ -11,20 +11,29 @@ import {
     useTheme,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
-
+import { getFiscalYear, updateFiscalYear } from "../../../../api/FiscalYear/FiscalYearApi";
+import { useQueryClient } from "@tanstack/react-query";
+import { useParams } from "react-router-dom";
 interface FiscalYearFormData {
     fiscalYearFrom: string;
     fiscalYearTo: string;
 }
 
+interface Props {
+  id: string;
+}
+
 export default function UpdateFiscalYear() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+    const queryClient = useQueryClient();
+    const { id } = useParams<{ id: string }>();
 
     const {
         control,
         handleSubmit,
         watch,
+        reset,
         formState: { errors },
     } = useForm<FiscalYearFormData>({
         defaultValues: {
@@ -35,10 +44,32 @@ export default function UpdateFiscalYear() {
 
     const fiscalYearFrom = watch("fiscalYearFrom");
 
-    const onSubmit = (data: FiscalYearFormData) => {
-        console.log("Submitted:", data);
-        alert("Fiscal Year submitted successfully!");
+      useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getFiscalYear(id);
+        reset({
+          fiscalYearFrom: data.fiscal_year_from,
+          fiscalYearTo: data.fiscal_year_to,
+        });
+      } catch (err) {
+        alert("Error fetching fiscal year data: " + JSON.stringify(err));
+      }
     };
+    fetchData();
+  }, [id, reset]);
+
+  const onSubmit = async (data: FiscalYearFormData) => {
+    try {
+      const updated = await updateFiscalYear(id, data);
+      console.log("Fiscal Year updated:", updated);
+      alert("Fiscal Year updated successfully!");
+      queryClient.invalidateQueries({ queryKey: ["fiscal-years"] });
+      queryClient.refetchQueries({ queryKey: ["fiscal-years"] });
+    } catch (err: any) {
+      alert("Error updating fiscal year: " + JSON.stringify(err));
+    }
+  };
 
     return (
         <Stack alignItems="center" sx={{ mt: 4, px: 2 }}>

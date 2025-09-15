@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Stack,
@@ -9,7 +9,10 @@ import {
   useTheme,
   useMediaQuery,
 } from "@mui/material";
+import { useQueryClient } from "@tanstack/react-query";
 import theme from "../../../../theme";
+import { useNavigate, useParams } from "react-router";
+import { getSalesPerson, updateSalesPerson } from "../../../../api/SalesPerson/SalesPersonApi";
 
 interface SalesPersonFormData {
   name: string;
@@ -36,6 +39,25 @@ export default function UpdateSalesPerson() {
 
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
+  const queryClient = useQueryClient();
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (id) {
+      getSalesPerson(id).then((salesPerson) => {
+        setFormData({
+          name: salesPerson.name,
+          telephone: salesPerson.telephone,
+          fax: salesPerson.fax,
+          email: salesPerson.email,
+          provision: salesPerson.provision?.toString() || "",
+          turnoverBreakPoint: salesPerson.turnover_break_point?.toString() || "",
+          provision2: salesPerson.provision2?.toString() || "",
+        });
+      });
+    }
+  }, [id]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -65,15 +87,34 @@ export default function UpdateSalesPerson() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
-    if (validate()) {
-      console.log("Submitted Sales Person Data:", formData);
-      alert("Sales person updated successfully!");
+  const handleSubmit = async () => {
+    if (validate() && id) {
+      try {
+        const payload = {
+          name: formData.name,
+          telephone: formData.telephone,
+          fax: formData.fax,
+          email: formData.email,
+          provision: parseFloat(formData.provision),
+          turnover_break_point: parseFloat(formData.turnoverBreakPoint),
+          provision2: parseFloat(formData.provision2),
+        };
+
+        const updated = await updateSalesPerson(id, payload);
+        alert("Sales Person updated successfully!");
+
+        queryClient.invalidateQueries({ queryKey: ["sales_people"] });
+        navigate("/sales/maintenance/sales-persons");
+      } catch (err: any) {
+        console.error("Error updating sales person:", err);
+        alert("Error updating sales person: " + JSON.stringify(err));
+      }
     }
   };
 
+
   return (
-    <Stack alignItems="center" sx={{ mt: 4,px: isMobile ? 2 : 0 }}>
+    <Stack alignItems="center" sx={{ mt: 4, px: isMobile ? 2 : 0 }}>
       <Paper
         sx={{
           p: theme.spacing(3),
