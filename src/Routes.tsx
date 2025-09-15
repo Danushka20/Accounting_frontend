@@ -1,0 +1,1136 @@
+import React, { Suspense, useMemo } from "react";
+import { Navigate, Outlet, Route, Routes } from "react-router";
+import MainLayout from "./components/Layout/MainLayout";
+import PageLoader from "./components/PageLoader";
+import useCurrentUser from "./hooks/useCurrentUser";
+import { PermissionKeys } from "./views/Administration/SectionList";
+import PermissionDenied from "./components/PermissionDenied";
+import { useQuery } from "@tanstack/react-query";
+import { User, validateUser } from "./api/userApi";
+import { AuditCalendar } from "./views/AuditAndInspection/Calendar/Calendar";
+import Maintenance from "./views/Sales/Maintenance/SalesMaintenance";
+import InquiriesAndReports from "./views/Sales/InquiriesAndReports/SalesInquiriesAndReports";
+import SalesQuotationEntry from "./views/Sales/Transactions/SalesQuotationEntry";
+import SalesTransactions from "./views/Sales/Transactions/SalesTransactions";
+import PurchaseTransactions from "./views/Purchases/Transactions/PurchaseTransactions";
+import PurchaseInquiriesAndReports from "./views/Purchases/InquiriesAndReports/PurchaseInquiriesAndReports";
+import PurchaseMaintenance from "./views/Purchases/Maintenance/PurchaseMaintenance";
+import ItemsTransactions from "./views/ItemsAndInventory/Transactions/ItemsTransactions";
+import ItemsInquiriesAndReports from "./views/ItemsAndInventory/InquiriesAndReports/ItemsInquiriesAndReports";
+import ItemsMaintenance from "./views/ItemsAndInventory/Maintenance/ItemsMaintenance";
+import ItemsPricingAndCosts from "./views/ItemsAndInventory/PricingAndCosts/PricingAndCosts";
+import ManufacturingTransactions from "./views/Manufacturing/Transactions/ManufacturingTransactions";
+import ManufacturingInquiriesAndReports from "./views/Manufacturing/InquiriesAndReports/ManufacturingInquiriesAndReports";
+import ManufacturingMaintenance from "./views/Manufacturing/Maintenance/ManufacturingMaintenance";
+import FixedAssestsTransactions from "./views/FixedAssets/Transactions/FixedAssestsTransactions";
+import DimensionTransactions from "./views/Dimensions/Transactions/DimensionTransactions";
+import DimensionInquiriesAndReports from "./views/Dimensions/InquiriesAndReports/DimensionInquiriesAndReports";
+import DimensionMaintenance from "./views/Dimensions/Maintenance/DimensionMaintenance";
+import BankingTransactions from "./views/BankindAndGeneralLedger/Transactions/BankingTransactions";
+import BankingInquiriesAndReports from "./views/BankindAndGeneralLedger/InquiriesAndReports/BankingInquiriesAndReports";
+import BankingMaintenance from "./views/BankindAndGeneralLedger/Maintenance/BankingMaintenance";
+import SetupMaintenance from "./views/Setup/Maintenance/SetupMaintenance";
+import Dashboard from "./views/Dashboard/Dashboard";
+import CompanySetup from "./views/Setup/CompanySetup/CompanySetup";
+import Miscellaneous from "./views/Setup/Miscellaneous/Miscellaneous";
+import FixedAssestsMaintenance from "./views/FixedAssets/Maintenance/FixedAssestsMaintenance";
+import FixedAssestsInquiriesAndReports from "./views/FixedAssets/InquiriesAndReports/FixedAssestsInquiriesAndReports";
+import CompanySetupForm from "./views/Setup/CompanySetup/CompanySetup/CompanySetupForm";
+import AddUserForm from "./views/Setup/CompanySetup/User/AddUserForm";
+import UserManagementTable from "./views/Setup/CompanySetup/User/UserManagementTable";
+import FiscalYear from "./views/Setup/CompanySetup/FiscalYear/AddFiscalYear";
+import FiscalYearTable from "./views/Setup/CompanySetup/FiscalYear/FiscalYearTable";
+import TaxGroupsTable from "./views/Setup/CompanySetup/TaxGroups/TaxGroupsTable";
+import TaxGroups from "./views/Setup/CompanySetup/TaxGroups/AddTaxGroups";
+import TaxTypes from "./views/Setup/CompanySetup/TaxTypes/AddTaxTypes";
+import TaxTypesTable from "./views/Setup/CompanySetup/TaxTypes/TaxTypesTable";
+import Currencies from "./views/BankindAndGeneralLedger/Maintenance/Currencies/AddCurrencies";
+import CurrenciesTable from "./views/BankindAndGeneralLedger/Maintenance/Currencies/CurrenciesTable";
+import UserAccessForm from "./views/Setup/CompanySetup/UserAccess/AddUserAccessForm";
+import AddUserAccessForm from "./views/Setup/CompanySetup/UserAccess/AddUserAccessForm";
+import UpdateUserAccessForm from "./views/Setup/CompanySetup/UserAccess/UpdateUserAccessForm";
+import UpdateUserForm from "./views/Setup/CompanySetup/User/UpdateUserForm";
+import AddTaxTypes from "./views/Setup/CompanySetup/TaxTypes/AddTaxTypes";
+import UpdateTaxTypes from "./views/Setup/CompanySetup/TaxTypes/UpdateTaxTypes";
+import AddTaxGroupsForm from "./views/Setup/CompanySetup/TaxGroups/AddTaxGroups";
+import UpdateTaxGroupsForm from "./views/Setup/CompanySetup/TaxGroups/UpdateTaxGroups";
+import AddFiscalYear from "./views/Setup/CompanySetup/FiscalYear/AddFiscalYear";
+import UpdateFiscalYear from "./views/Setup/CompanySetup/FiscalYear/UpdateFiscalYear";
+import AddCurrencies from "./views/BankindAndGeneralLedger/Maintenance/Currencies/AddCurrencies";
+import UpdateCurrencies from "./views/BankindAndGeneralLedger/Maintenance/Currencies/UpdateCurrencies";
+import AddSalesPerson from "./views/Sales/Maintenance/SalesPersons/AddSalesPersonForm";
+import UpdateSalesPerson from "./views/Sales/Maintenance/SalesPersons/UpdateSalesPersonForm";
+import SalesPersonTable from "./views/Sales/Maintenance/SalesPersons/SalesPersonTable";
+import AddSalesAreaForm from "./views/Sales/Maintenance/SalesAreas/AddSalesAreaForm";
+import UpdateSalesAreaForm from "./views/Sales/Maintenance/SalesAreas/UpdateSalesAreaForm";
+import SalesAreaTable from "./views/Sales/Maintenance/SalesAreas/SalesAreaTable";
+import SalesTypesTable from "./views/Sales/Maintenance/SalesTypes/SalesTypesTable";
+import AddSalesTypesForm from "./views/Sales/Maintenance/SalesTypes/AddSalesTypesForm";
+import UpdateSalesTypesForm from "./views/Sales/Maintenance/SalesTypes/UpdateSalesTypesForm";
+import CreditStatusTable from "./views/Sales/Maintenance/CreditStatusSetup/CreditStatusTable";
+import AddCreditStatusForm from "./views/Sales/Maintenance/CreditStatusSetup/AddCreditStatusForm";
+import UpdateCreditStatusForm from "./views/Sales/Maintenance/CreditStatusSetup/UpdateCreditStatusForm";
+import AddManageCutomers from "./views/Sales/Maintenance/AddManageCustomers/AddManageCustomers";
+import AddSalesGroupsForm from "./views/Sales/Maintenance/SalesGroups/AddSalesGroupsForm";
+import UpdateSalesGroupsForm from "./views/Sales/Maintenance/SalesGroups/UpdateSalesGroupsForm";
+import SalesGroupsTable from "./views/Sales/Maintenance/SalesGroups/SalesGroupsTable";
+import Suppliers from "./views/Purchases/Maintenance/Suppliers/Suppliers";
+import GeneralSettingsForm from "./views/Sales/Maintenance/AddManageCustomers/GeneralSettingsForm";
+import SupplierGeneralSettingsForm from "./views/Purchases/Maintenance/Suppliers/SupplierGeneralSettingsForm";
+import UnitsOfMeasureTable from "./views/ItemsAndInventory/Maintenance/UnitsOfMeasure/UnitsOfMeasureTable";
+import AddUnitsOfMeasureForm from "./views/ItemsAndInventory/Maintenance/UnitsOfMeasure/AddUnitsOfMeasureForm";
+import UpdateUnitsOfMeasureForm from "./views/ItemsAndInventory/Maintenance/UnitsOfMeasure/UpdateUnitsOfMeasureForm";
+import Items from "./views/ItemsAndInventory/Maintenance/Items/Items";
+import ItemsGeneralSettingsForm from "./views/ItemsAndInventory/Maintenance/Items/ItemsGeneralSettingsForm";
+import InventoryLocationTable from "./views/ItemsAndInventory/Maintenance/InventoryLocations/InventoryLocationTable";
+import AddInventoryLocationForm from "./views/ItemsAndInventory/Maintenance/InventoryLocations/AddInventoryLocationsForm";
+import UpdateInventoryLocationForm from "./views/ItemsAndInventory/Maintenance/InventoryLocations/UpdateInventoryLocationsForm";
+import ItemCategoriesTable from "./views/ItemsAndInventory/Maintenance/ItemCategories/ItemCategoriesTable";
+import AddItemCategoriesForm from "./views/ItemsAndInventory/Maintenance/ItemCategories/AddItemCategoriesForm";
+import UpdateItemCategoriesForm from "./views/ItemsAndInventory/Maintenance/ItemCategories/UpdateItemCategoriesForm";
+import WorkCentresTable from "./views/Manufacturing/Maintenance/WorkCenter/WorkCentresTable";
+import AddWorkCentresForm from "./views/Manufacturing/Maintenance/WorkCenter/AddWorkCentresForm";
+import UpdateWorkCentresForm from "./views/Manufacturing/Maintenance/WorkCenter/UpdateWorkCentresForm";
+import BankAccountsTable from "./views/BankindAndGeneralLedger/Maintenance/BankAccounts/BankAccountsTable";
+import AddBankAccountsForm from "./views/BankindAndGeneralLedger/Maintenance/BankAccounts/AddBankAccountsForm";
+import UpdateBankAccountsForm from "./views/BankindAndGeneralLedger/Maintenance/BankAccounts/UpdateBankAccountsForm";
+import AddQuickEntriesForm from "./views/BankindAndGeneralLedger/Maintenance/QuickEntries/AddQuickEntriesForm";
+import UpdateQuickEntriesForm from "./views/BankindAndGeneralLedger/Maintenance/QuickEntries/UpdateQuickEntriesForm";
+import QuickEntriesTable from "./views/BankindAndGeneralLedger/Maintenance/QuickEntries/QuickEntriesTable";
+import GlAccountGroupsTable from "./views/BankindAndGeneralLedger/Maintenance/GlAccountGroups/GlAccountGroupsTable";
+import AddGlAccountGroupsForm from "./views/BankindAndGeneralLedger/Maintenance/GlAccountGroups/AddGlAccountGroupsForm";
+import UpdateGlAccountGroupsForm from "./views/BankindAndGeneralLedger/Maintenance/GlAccountGroups/UpdateGlAccountGroupsForm";
+import RevaluateCurrenciesForm from "./views/BankindAndGeneralLedger/Maintenance/RevaluationOfCurrencyAccounts/RevaluateCurrencies";
+import GlAccountClassesTable from "./views/BankindAndGeneralLedger/Maintenance/GlAccountClasses/GlAccountClassesTable";
+import AddGlAccountClassesForm from "./views/BankindAndGeneralLedger/Maintenance/GlAccountClasses/AddGlAccountClassesForm";
+import UpdateGlAccountClassesForm from "./views/BankindAndGeneralLedger/Maintenance/GlAccountClasses/UpdateGlAccountClassesForm";
+import AddChartofAccounts from "./views/Setup/Maintenance/ChartOfAccounts/AddChartOfAccounts";
+
+const LoginPage = React.lazy(() => import("./views/LoginPage/LoginPage"));
+const RegistrationPage = React.lazy(
+  () => import("./views/RegistrationPage/RegistrationPage")
+);
+const InsightsPage = React.lazy(() => import("./views/Insights/Insight"));
+
+//Administration
+const UserTable = React.lazy(() => import("./views/Administration/UserTable"));
+const AccessManagementTable = React.lazy(
+  () => import("./views/Administration/AccessManagementTable")
+);
+const OrganizationTable = React.lazy(
+  () => import("./views/Administration/OrganizationSettings/OrganizationSettingsTable")
+);
+
+const UnderDevelopment = React.lazy(
+  () => import("./components/UnderDevelopment")
+);
+
+//sustainability apps
+//chemical management
+// const ChemicalRequestTable = React.lazy(
+//   () => import("./views/ChemicalMng/ChemicalRequestTable")
+// );
+// const ChemicalPurchaseInventoryTable = React.lazy(
+//   () => import("./views/ChemicalMng/ChemicalPurchaseInventoryTable")
+// );
+// const ChemicalTransactionTable = React.lazy(
+//   () => import("./views/ChemicalMng/TransactionTable")
+// );
+// const ChemicalDashboard = React.lazy(
+//   () => import("./views/ChemicalMng/Dashboard")
+// );
+
+//health and safety apps
+//document
+const DocumentRegister = React.lazy(
+  () => import("./views/DocumentsPage/DocumentsTable")
+);
+
+//audit and inspection
+const InternalAuditTable = React.lazy(
+  () => import("./views/AuditAndInspection/InternalAudit/InternalAuditTable")
+);
+
+const AuditBuilderTable = React.lazy(
+  () => import("./views/AuditAndInspection/AuditBuilder/AuditBuilderTable")
+);
+
+//hazard and risk
+const HazardRiskDashboard = React.lazy(
+  () => import("./views/HazardAndRisk/Dashboard")
+);
+const HazardRiskTable = React.lazy(
+  () => import("./views/HazardAndRisk/HazardRiskTable")
+);
+
+//Occupational Health
+
+//Dashboard
+const OccupationalHealthDashboard = React.lazy(
+  () => import("./views/OccupationalHealth/OccupationalHealthDashboard")
+);
+
+//Patient Register
+const PatientTable = React.lazy(
+  () => import("./views/OccupationalHealth/ClinicalSuite/PatientTable")
+);
+
+//Medicine Stock
+const MedicineStockTable = React.lazy(
+  () => import("./views/OccupationalHealth/ClinicalSuite/MedicineStockTable")
+);
+
+//Medicine Request
+const MedicineRequestTable = React.lazy(
+  () =>
+    import(
+      "./views/OccupationalHealth/MedicineInventory/MedicineRequest/MedicineRequestTable"
+    )
+);
+
+//Medicine Inventory
+const PurchaseAndInventoryTable = React.lazy(
+  () =>
+    import(
+      "./views/OccupationalHealth/MedicineInventory/PurchaseAndInventory/PurchaseAndInventoryTable"
+    )
+);
+
+const PurchaseAndInventoryTransactionTable = React.lazy(
+  () => import("./views/OccupationalHealth/MedicineInventory/TransactionTable")
+);
+
+//Maternity Register
+const MaternityRegisterTable = React.lazy(
+  () =>
+    import("./views/OccupationalHealth/MedicalReports/MaternityRegisterTable")
+);
+
+//External Audit And Inspection
+const ExternalAuditTable = React.lazy(
+  () => import("./views/AuditAndInspection/ExternalAudit/AuditTable")
+);
+
+//Sustainability
+const SustainabilityTable = React.lazy(
+  () => import("./views/Sustainability/SustainabilityTable")
+);
+
+//Environment
+const TargetSettingsTable = React.lazy(
+  () => import("./views/Environment/TargetSettings/TargetSettingsTable")
+);
+
+const EnvironmentTable = React.lazy(
+  () => import("./views/Environment/Consumption/ConsumptionTable")
+);
+const AuditAndInspectionDashboard = React.lazy(
+  () => import("./views/AuditAndInspection/Dashboard")
+);
+
+const Autocomplete = React.lazy(
+  () => import("./views/Components/Autocomplete")
+);
+const TextField = React.lazy(
+  () => import("./views/Components/TextField")
+);
+const DatePickers = React.lazy(
+  () => import("./views/Components/DatePickers")
+);
+const OtherInputs = React.lazy(
+  () => import("./views/Components/OtherInputs")
+);
+const EnvironmentDashBoard = React.lazy(
+  () => import("./views/Environment/Dashboard")
+);
+
+const AccordianAndDividers = React.lazy(
+  () => import("./views/Components/AccordianAndDividers")
+);
+function withLayout(Layout: any, Component: any, restrictAccess = false) {
+  return (
+    <Layout>
+      <Suspense
+        fallback={
+          <>
+            <PageLoader />
+          </>
+        }
+      >
+        {restrictAccess ? <PermissionDenied /> : <Component />}
+      </Suspense>
+    </Layout>
+  );
+}
+
+function withoutLayout(Component: React.LazyExoticComponent<any>) {
+  return (
+    <Suspense
+      fallback={
+        <>
+          <PageLoader />
+        </>
+      }
+    >
+      <Component />
+    </Suspense>
+  );
+}
+
+const ProtectedRoute = () => {
+  const { user, status } = useCurrentUser();
+
+  if (status === "loading" || status === "idle" || status === "pending") {
+    return <PageLoader />;
+  }
+
+  if (!user) {
+    return <Navigate to="/" />;
+  }
+
+  return <Outlet />;
+};
+
+const AppRoutes = () => {
+  const { data: user, status } = useQuery<User>({
+    queryKey: ["current-user"],
+    queryFn: validateUser,
+  });
+
+  const userPermissionObject = useMemo(() => {
+    if (user && user?.permissionObject) {
+      return user?.permissionObject;
+    }
+  }, [user]);
+  console.log("user", user);
+  return (
+    <Routes>
+      <Route path="/" element={withoutLayout(LoginPage)} />
+      <Route path="/register" element={withoutLayout(RegistrationPage)} />
+      <Route element={<ProtectedRoute />}>
+        <Route
+          path="/dashboard"
+          element={withLayout(MainLayout, Dashboard)}
+        />
+
+        {/* Administration */}
+        <Route
+          path="/admin/organization-settings"
+          element={withLayout(
+            MainLayout,
+            OrganizationTable,
+            !userPermissionObject?.[PermissionKeys.ADMIN_USERS_VIEW]
+          )}
+        />
+
+        <Route
+          path="/admin/users"
+          element={withLayout(
+            MainLayout,
+            UserTable,
+            !userPermissionObject?.[PermissionKeys.ADMIN_USERS_VIEW]
+          )}
+        />
+        <Route
+          path="/admin/access-management"
+          element={withLayout(
+            MainLayout,
+            AccessManagementTable,
+            !userPermissionObject?.[PermissionKeys.ADMIN_ACCESS_MNG_VIEW]
+          )}
+        />
+
+        {/* Audit & Inspection */}
+        {/* <Route
+          path="/input-fields/autocomplete"
+          element={withLayout(
+            MainLayout,
+            Autocomplete,
+            !userPermissionObject?.[
+            PermissionKeys.AUDIT_INSPECTION_DASHBOARD_VIEW
+            ]
+          )}
+        />
+        <Route
+          path="/input-fields/textfield"
+          element={withLayout(
+            MainLayout,
+            TextField,
+            !userPermissionObject?.[
+            PermissionKeys.AUDIT_INSPECTION_DASHBOARD_VIEW
+            ]
+          )}
+        />
+        <Route
+          path="/input-fields/date-pickers"
+          element={withLayout(
+            MainLayout,
+            DatePickers,
+            !userPermissionObject?.[
+            PermissionKeys.AUDIT_INSPECTION_DASHBOARD_VIEW
+            ]
+          )}
+        />
+        <Route
+          path="/input-fields/other-inputs"
+          element={withLayout(
+            MainLayout,
+            OtherInputs,
+            !userPermissionObject?.[
+            PermissionKeys.AUDIT_INSPECTION_DASHBOARD_VIEW
+            ]
+          )}
+        />
+        <Route
+          path="/components/accordian-divider"
+          element={withLayout(
+            MainLayout,
+            AccordianAndDividers,
+            !userPermissionObject?.[
+            PermissionKeys.AUDIT_INSPECTION_DASHBOARD_VIEW
+            ]
+          )}
+        />
+        <Route
+          path="/audit-inspection/calendar"
+          element={withLayout(
+            MainLayout,
+            AuditCalendar */}
+            // !userPermissionObject?.[
+            //   PermissionKeys.AUDIT_INSPECTION_CALENDAR_VIEW
+            // ]
+          {/* )}
+        /> */}
+        {/* <Route
+          path="/audit-inspection/internal-audit/form-builder"
+          element={withLayout(
+            MainLayout,
+            AuditBuilderTable,
+            !userPermissionObject?.[
+            PermissionKeys.AUDIT_INSPECTION_INTERNAL_AUDIT_FORM_BUILDER_VIEW
+            ]
+          )}
+        />
+        <Route
+          path="/audit-inspection/internal-audit/scheduled-audits"
+          element={withLayout(
+            MainLayout,
+            InternalAuditTable,
+            !userPermissionObject?.[
+            PermissionKeys.AUDIT_INSPECTION_INTERNAL_AUDIT_REGISTER_VIEW
+            ]
+          )}
+        />
+        <Route
+          path="/audit-inspection/external-audit"
+          element={withLayout(
+            MainLayout,
+            () => (
+              <UnderDevelopment pageName="Audit & Inspection > External Audit" />
+            ) */}
+            // !userPermissionObject?.[
+            //   PermissionKeys.AUDIT_INSPECTION_EXTERNAL_AUDIT_QUEUE_VIEW
+            // ]
+          {/* )}
+        /> */}
+
+        {/* sustainability apps */}
+        
+
+        {/* document */}
+        <Route
+          path="/document"
+          element={withLayout(
+            MainLayout,
+            DocumentRegister,
+            !userPermissionObject?.[PermissionKeys.DOCUMENT_REGISTER_VIEW]
+          )}
+        />
+        {/* hazard and risk */}
+        <Route
+          path="/hazard-risk/dashboard"
+          element={withLayout(
+            MainLayout,
+            HazardRiskDashboard,
+            !userPermissionObject?.[PermissionKeys.HAZARD_RISK_DASHBOARD_VIEW]
+          )}
+        />
+        <Route
+          path="/hazard-risk/history"
+          element={withLayout(
+            MainLayout,
+            () => (
+              <HazardRiskTable isAssignedTasks={false} />
+            ),
+            !userPermissionObject?.[PermissionKeys.HAZARD_RISK_REGISTER_VIEW]
+          )}
+        />
+        <Route
+          path="/hazard-risk/assigned-tasks"
+          element={withLayout(
+            MainLayout,
+            () => (
+              <HazardRiskTable isAssignedTasks={true} />
+            ),
+            !userPermissionObject?.[
+            PermissionKeys.HAZARD_RISK_ASSIGNED_TASKS_VIEW
+            ]
+          )}
+        />
+        {/* Occupational health */}
+        {/* Dashboard */}
+        <Route
+          path="/occupational-health/dashboard"
+          element={withLayout(
+            MainLayout,
+            OccupationalHealthDashboard,
+            !userPermissionObject?.[
+            PermissionKeys.OCCUPATIONAL_HEALTH_DASHBOARD_VIEW
+            ]
+          )}
+        />
+        {/* Clinical Suite */}
+        <Route
+          path="/occupational-health/clinical-suite/patient-register"
+          element={withLayout(
+            MainLayout,
+            PatientTable,
+            !userPermissionObject?.[
+            PermissionKeys
+              .OCCUPATIONAL_HEALTH_CLINICAL_SUITE_PATIENT_REGISTER_VIEW
+            ]
+          )}
+        />
+        <Route
+          path="/occupational-health/clinical-suite/consultation"
+          element={withLayout(
+            MainLayout,
+            () => (
+              <UnderDevelopment pageName="Clinical Suite > Consultation" />
+            )
+            // !userPermissionObject?.[
+            //   PermissionKeys
+            //     .OCCUPATIONAL_HEALTH_CLINICAL_SUITE_CONSULTATION_VIEW
+            // ]
+          )}
+        />
+        <Route
+          path="/occupational-health/clinical-suite/medicine-stock"
+          element={withLayout(
+            MainLayout,
+            MedicineStockTable,
+            !userPermissionObject?.[
+            PermissionKeys
+              .OCCUPATIONAL_HEALTH_CLINICAL_SUITE_MEDICINE_STOCK_VIEW
+            ]
+          )}
+        />
+        <Route
+          path="/occupational-health/clinical-suite/pharmacy-queue"
+          element={withLayout(
+            MainLayout,
+            () => (
+              <UnderDevelopment pageName="Clinical Suite > Pharmacy Queue" />
+            )
+            // !userPermissionObject?.[
+            //   PermissionKeys
+            //     .OCCUPATIONAL_HEALTH_CLINICAL_SUITE_PHARMACY_QUEUE_VIEW
+            // ]
+          )}
+        />
+        {/* Medicine Inventory */}
+        <Route
+          path="/occupational-health/medicines-inventory/medicine-request"
+          element={withLayout(
+            MainLayout,
+            () => (
+              <MedicineRequestTable isAssignedTasks={false} />
+            ),
+            !userPermissionObject?.[
+            PermissionKeys
+              .OCCUPATIONAL_HEALTH_MEDICINE_INVENTORY_MEDICINE_REQUEST_VIEW
+            ]
+          )}
+        />
+        <Route
+          path="/occupational-health/medicines-inventory/purchase-inventory"
+          element={withLayout(
+            MainLayout,
+            PurchaseAndInventoryTable,
+            !userPermissionObject?.[
+            PermissionKeys
+              .OCCUPATIONAL_HEALTH_MEDICINE_INVENTORY_PURCHASE_INVENTORY_VIEW
+            ]
+          )}
+        />
+        <Route
+          path="/occupational-health/medicines-inventory/transaction"
+          element={withLayout(
+            MainLayout,
+            PurchaseAndInventoryTransactionTable,
+            !userPermissionObject?.[
+            PermissionKeys
+              .OCCUPATIONAL_HEALTH_MEDICINE_INVENTORY_TRANSACTION_VIEW
+            ]
+          )}
+        />
+        <Route
+          path="/occupational-health/medicines-inventory/assigned-tasks"
+          element={withLayout(
+            MainLayout,
+            () => (
+              <MedicineRequestTable isAssignedTasks={true} />
+            ),
+            !userPermissionObject?.[
+            PermissionKeys
+              .OCCUPATIONAL_HEALTH_MEDICINE_INVENTORY_ASSIGNED_TASKS_VIEW
+            ]
+          )}
+        />
+        {/* Medical Records */}
+        <Route
+          path="/occupational-health/medical-records/maternity-register"
+          element={withLayout(
+            MainLayout,
+            MaternityRegisterTable,
+            !userPermissionObject?.[
+            PermissionKeys
+              .OCCUPATIONAL_HEALTH_MEDICAL_RECORDS_MATERNITY_REGISTER_VIEW
+            ]
+          )}
+        />
+
+        {/* External Audits */}
+        <Route
+          path="/audit-inspection/external-audit/register"
+          element={withLayout(
+            MainLayout,
+            ExternalAuditTable,
+            !userPermissionObject?.[
+            PermissionKeys.AUDIT_INSPECTION_EXTERNAL_AUDIT_REGISTER_VIEW
+            ]
+          )}
+        />
+        <Route
+          path="/sustainability/register"
+          element={withLayout(
+            MainLayout,
+            SustainabilityTable,
+            !userPermissionObject?.[
+            PermissionKeys.SUSTAINABILITY_SDG_REPORTING_CREATE
+            ]
+          )}
+        />
+        <Route
+          path="/environment/dashboard"
+          element={withLayout(
+            MainLayout,
+            EnvironmentDashBoard,
+            !userPermissionObject?.[PermissionKeys.ENVIRONMENT_DASHBOARD_VIEW]
+          )}
+        />
+        <Route
+          path="/environment/history/target-setting"
+          element={withLayout(
+            MainLayout,
+            TargetSettingsTable,
+            !userPermissionObject?.[
+            PermissionKeys.ENVIRONMENT_HISTORY_TARGET_SETTING_VIEW
+            ]
+          )}
+        />
+        <Route
+          path="/environment/assigned-tasks/target-setting"
+          element={withLayout(
+            MainLayout,
+            () => (
+              <TargetSettingsTable isAssignedTasks={true} />
+            ),
+            !userPermissionObject?.[
+            PermissionKeys.ENVIRONMENT_ASSIGNED_TASKS_TARGET_SETTING_VIEW
+            ]
+          )}
+        />
+        <Route
+          path="/environment/history/consumption"
+          element={withLayout(
+            MainLayout,
+            EnvironmentTable,
+            !userPermissionObject?.[
+            PermissionKeys.ENVIRONMENT_HISTORY_CONSUMPTION_VIEW
+            ]
+          )}
+        />
+        <Route
+          path="/environment/assigned-tasks/consumption"
+          element={withLayout(
+            MainLayout,
+            () => (
+              <EnvironmentTable isAssignedTasks={true} />
+            ),
+            !userPermissionObject?.[
+            PermissionKeys.ENVIRONMENT_ASSIGNED_TASKS_CONSUMPTION_VIEW
+            ]
+          )}
+        />
+      </Route>
+      <Route
+        path="/audit-inspection/external-audit/assigned-tasks"
+        element={withLayout(
+          MainLayout,
+          () => (
+            <ExternalAuditTable
+              isAssignedTasks={true}
+              isCorrectiveAction={false}
+              isAuditQueue={false}
+            />
+          ),
+          false
+          // !userPermissionObject?.[
+          //   PermissionKeys.AUDIT_INSPECTION_EXTERNAL_AUDIT_TASK_VIEW
+          // ]
+        )}
+      />
+      <Route
+        path="/audit-inspection/external-audit/audit-queue"
+        element={withLayout(
+          MainLayout,
+          () => (
+            <ExternalAuditTable
+              isAssignedTasks={false}
+              isCorrectiveAction={false}
+              isAuditQueue={true}
+            />
+          ),
+          !userPermissionObject?.[
+          PermissionKeys.AUDIT_INSPECTION_EXTERNAL_AUDIT_QUEUE_VIEW
+          ]
+        )}
+      />
+      <Route
+        path="/audit-inspection/external-audit/corrective-action"
+        element={withLayout(
+          MainLayout,
+          () => (
+            <ExternalAuditTable
+              isAssignedTasks={false}
+              isCorrectiveAction={true}
+              isAuditQueue={false}
+            />
+          ),
+          !userPermissionObject?.[
+          PermissionKeys
+            .AUDIT_INSPECTION_EXTERNAL_AUDIT_CORRECTIVE_ACTION_VIEW
+          ]
+        )}
+      />
+
+      <Route
+        path="/sales/transactions"
+        element={withLayout(MainLayout, SalesTransactions)}
+      />
+      <Route
+        path="/sales/transactions/sales-quotation-entry"
+        element={withLayout(MainLayout, SalesQuotationEntry)}
+      />
+      <Route
+        path="/sales/inquiriesandreports"
+        element={withLayout(MainLayout, InquiriesAndReports)}
+      />
+      <Route
+        path="/sales/maintenance"
+        element={withLayout(MainLayout, Maintenance)}
+      />
+      <Route
+        path="/sales/maintenance/add-and-manage-customers"
+        element={withLayout(MainLayout, AddManageCutomers)}
+      />
+      <Route
+        path="/sales/maintenance/add-and-manage-customers/general-settings"
+        element={withLayout(MainLayout, GeneralSettingsForm)}
+      />
+      <Route
+        path="/sales/maintenance/add-and-manage-customers/contacts"
+        element={withLayout(MainLayout, AddManageCutomers)}
+      />
+      <Route
+        path="/sales/maintenance/add-and-manage-customers/transactions"
+        element={withLayout(MainLayout, AddManageCutomers)}
+      />
+      <Route
+        path="/sales/maintenance/add-and-manage-customers/sales-orders"
+        element={withLayout(MainLayout, AddManageCutomers)}
+      />
+      <Route
+        path="/sales/maintenance/add-and-manage-customers/attachments"
+        element={withLayout(MainLayout, AddManageCutomers)}
+      />
+      <Route
+        path="/sales/maintenance/sales-groups"
+        element={withLayout(MainLayout, SalesGroupsTable)}
+      />
+      <Route
+        path="/sales/maintenance/sales-groups/add-sales-groups"
+        element={withLayout(MainLayout, AddSalesGroupsForm)}
+      />
+      <Route
+        path="/sales/maintenance/sales-groups/update-sales-groups"
+        element={withLayout(MainLayout, UpdateSalesGroupsForm)}
+      />
+      <Route
+        path="/sales/maintenance/sales-persons"
+        element={withLayout(MainLayout, SalesPersonTable)}
+      />
+      <Route
+        path="/sales/maintenance/sales-persons/add-sales-person"
+        element={withLayout(MainLayout, AddSalesPerson)}
+      />
+      <Route
+        path="/sales/maintenance/sales-persons/update-sales-person"
+        element={withLayout(MainLayout, UpdateSalesPerson)}
+      /><Route
+        path="/sales/maintenance/sales-areas"
+        element={withLayout(MainLayout, SalesAreaTable)}
+      />
+      <Route
+        path="/sales/maintenance/sales-areas/add-sales-area"
+        element={withLayout(MainLayout, AddSalesAreaForm)}
+      />
+      <Route
+        path="/sales/maintenance/sales-areas/update-sales-area"
+        element={withLayout(MainLayout, UpdateSalesAreaForm)}
+      />
+      <Route
+        path="/sales/maintenance/sales-types/"
+        element={withLayout(MainLayout, SalesTypesTable)}
+      />
+      <Route
+        path="/sales/maintenance/sales-areas/add-sales-types"
+        element={withLayout(MainLayout, AddSalesTypesForm)}
+      />
+      <Route
+        path="/sales/maintenance/sales-areas/update-sales-types"
+        element={withLayout(MainLayout, UpdateSalesTypesForm)}
+      />
+      <Route
+        path="/sales/maintenance/credit-status-setup"
+        element={withLayout(MainLayout, CreditStatusTable)}
+      />
+      <Route
+        path="/sales/maintenance/credit-status-setup/add-credit-status"
+        element={withLayout(MainLayout, AddCreditStatusForm)}
+      />
+      <Route
+        path="/sales/maintenance/credit-status-setup/update-credit-status"
+        element={withLayout(MainLayout, UpdateCreditStatusForm)}
+      />
+
+
+      <Route
+        path="/purchase/transactions"
+        element={withLayout(MainLayout, PurchaseTransactions)}
+      />
+      <Route
+        path="/purchase/inquiriesandreports"
+        element={withLayout(MainLayout, PurchaseInquiriesAndReports)}
+      />
+      <Route
+        path="/purchase/maintenance"
+        element={withLayout(MainLayout, PurchaseMaintenance)}
+      />
+      <Route
+        path="/purchase/maintenance/suppliers"
+        element={withLayout(MainLayout, Suppliers)}
+      />
+      <Route
+        path="/purchase/maintenance/suppliers/general-settings"
+        element={withLayout(MainLayout, SupplierGeneralSettingsForm)}
+      />
+
+      <Route
+        path="/itemsandinventory/transactions"
+        element={withLayout(MainLayout, ItemsTransactions)}
+      />
+      <Route
+        path="/itemsandinventory/inquiriesandreports"
+        element={withLayout(MainLayout, ItemsInquiriesAndReports)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance"
+        element={withLayout(MainLayout, ItemsMaintenance)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/units-of-measure"
+        element={withLayout(MainLayout, UnitsOfMeasureTable)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/units-of-measure/add-units-of-measure"
+        element={withLayout(MainLayout, AddUnitsOfMeasureForm)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/units-of-measure/update-units-of-measure"
+        element={withLayout(MainLayout, UpdateUnitsOfMeasureForm)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/items"
+        element={withLayout(MainLayout, Items)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/items/general-settings"
+        element={withLayout(MainLayout, ItemsGeneralSettingsForm)}
+      />
+
+      <Route
+        path="/itemsandinventory/maintenance/update-units-of-measure"
+        element={withLayout(MainLayout, UpdateUnitsOfMeasureForm)}
+      />
+
+      <Route
+        path="/itemsandinventory/maintenance/inventory-locations"
+        element={withLayout(MainLayout, InventoryLocationTable)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/add-inventory-location"
+        element={withLayout(MainLayout, AddInventoryLocationForm)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/update-inventory-location"
+        element={withLayout(MainLayout, UpdateInventoryLocationForm)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/item-categories"
+        element={withLayout(MainLayout, ItemCategoriesTable)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/add-item-categories"
+        element={withLayout(MainLayout, AddItemCategoriesForm)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/update-item-categories"
+        element={withLayout(MainLayout, UpdateItemCategoriesForm)}
+      />
+
+      <Route
+        path="/itemsandinventory/pricingandcosts"
+        element={withLayout(MainLayout, ItemsPricingAndCosts)}
+      />
+
+      <Route
+        path="/manufacturing/transactions"
+        element={withLayout(MainLayout, ManufacturingTransactions)}
+      />
+      <Route
+        path="/manufacturing/inquiriesandreports"
+        element={withLayout(MainLayout, ManufacturingInquiriesAndReports)}
+      />
+      <Route
+        path="/manufacturing/maintenance"
+        element={withLayout(MainLayout, ManufacturingMaintenance)}
+      />
+      <Route
+        path="/manufacturing/maintenance/work-centres"
+        element={withLayout(MainLayout, WorkCentresTable)}
+      />
+      <Route
+        path="/manufacturing/maintenance/add-work-centres"
+        element={withLayout(MainLayout, AddWorkCentresForm)}
+      />
+      <Route
+        path="/manufacturing/maintenance/update-work-centres"
+        element={withLayout(MainLayout, UpdateWorkCentresForm)}
+      />
+
+
+      <Route
+        path="/fixedassets/transactions"
+        element={withLayout(MainLayout, FixedAssestsTransactions)}
+      />
+      <Route
+        path="/fixedassets/inquiriesandreports"
+        element={withLayout(MainLayout, FixedAssestsInquiriesAndReports)}
+      />
+      <Route
+        path="/fixedassets/maintenance"
+        element={withLayout(MainLayout, FixedAssestsMaintenance)}
+      />
+
+      <Route
+        path="/dimension/transactions"
+        element={withLayout(MainLayout, DimensionTransactions)}
+      />
+      <Route
+        path="/dimension/inquiriesandreports"
+        element={withLayout(MainLayout, DimensionInquiriesAndReports)}
+      />
+      <Route
+        path="/dimension/maintenance"
+        element={withLayout(MainLayout, DimensionMaintenance)}
+      />
+
+      <Route
+        path="/bankingandgeneralledger/transactions"
+        element={withLayout(MainLayout, BankingTransactions)}
+      />
+      <Route
+        path="/bankingandgeneralledger/inquiriesandreports"
+        element={withLayout(MainLayout, BankingInquiriesAndReports)}
+      />
+      <Route
+        path="/bankingandgeneralledger/maintenance"
+        element={withLayout(MainLayout, BankingMaintenance)}
+      />
+      <Route
+        path="/bankingandgeneralledger/maintenance/bank-accounts"
+        element={withLayout(MainLayout, BankAccountsTable)}
+      />
+      <Route
+        path="/bankingandgeneralledger/maintenance/add-bank-accounts"
+        element={withLayout(MainLayout, AddBankAccountsForm)}
+      />
+      <Route
+        path="/bankingandgeneralledger/maintenance/update-bank-accounts"
+        element={withLayout(MainLayout, UpdateBankAccountsForm)}
+      />
+      <Route
+        path="/bankingandgeneralledger/maintenance/currencies"
+        element={withLayout(MainLayout, CurrenciesTable)}
+      />
+      <Route
+        path="/bankingandgeneralledger/maintenance/add-currency"
+        element={withLayout(MainLayout, AddCurrencies)}
+      />
+      <Route
+        path="/bankingandgeneralledger/maintenance/update-currency"
+        element={withLayout(MainLayout, UpdateCurrencies)}
+      />
+      <Route
+        path="/bankingandgeneralledger/maintenance/quick-entries"
+        element={withLayout(MainLayout, QuickEntriesTable)}
+      />
+      <Route
+        path="/bankingandgeneralledger/maintenance/add-quick-entry"
+        element={withLayout(MainLayout, AddQuickEntriesForm)}
+      />
+      <Route
+        path="/bankingandgeneralledger/maintenance/update-quick-entry"
+        element={withLayout(MainLayout, UpdateQuickEntriesForm)}
+      />
+      <Route
+        path="/bankingandgeneralledger/maintenance/gl-account-groups"
+        element={withLayout(MainLayout, GlAccountGroupsTable)}
+      />
+      <Route
+        path="/bankingandgeneralledger/maintenance/add-gl-account-groups"
+        element={withLayout(MainLayout, AddGlAccountGroupsForm)}
+      />
+      <Route
+        path="/bankingandgeneralledger/maintenance/update-gl-account-groups"
+        element={withLayout(MainLayout, UpdateGlAccountGroupsForm)}
+      />
+      <Route
+        path="/bankingandgeneralledger/maintenance/gl-account-classes"
+        element={withLayout(MainLayout, GlAccountClassesTable)}
+      />
+      <Route
+        path="/bankingandgeneralledger/maintenance/add-gl-account-classes"
+        element={withLayout(MainLayout, AddGlAccountClassesForm)}
+      />
+      <Route
+        path="/bankingandgeneralledger/maintenance/update-gl-account-classes"
+        element={withLayout(MainLayout, UpdateGlAccountClassesForm)}
+      />
+      <Route
+        path="/bankingandgeneralledger/maintenance/revaluation-of-currency-accounts"
+        element={withLayout(MainLayout, RevaluateCurrenciesForm)}
+      />
+
+      <Route
+        path="/setup/companysetup"
+        element={withLayout(MainLayout, CompanySetup)}
+      />
+      <Route
+        path="/setup/companysetup/company-setup"
+        element={withLayout(MainLayout, CompanySetupForm)}
+      />
+      <Route
+        path="/setup/companysetup/user-account-setup"
+        element={withLayout(MainLayout, UserManagementTable)}
+      />
+      <Route
+        path="/setup/companysetup/add-user"
+        element={withLayout(MainLayout, AddUserForm)}
+      />
+      <Route
+        path="/setup/companysetup/update-user/:id"
+        element={withLayout(MainLayout, UpdateUserForm)}
+      />
+      <Route
+        path="setup/companysetup/access-setup"
+        element={withLayout(MainLayout, AddUserAccessForm)}
+      />
+      <Route
+        path="setup/companysetup/edit-access-setup"
+        element={withLayout(MainLayout, UpdateUserAccessForm)}
+      />
+
+      <Route
+        path="/setup/companysetup/fiscal-years"
+        element={withLayout(MainLayout, FiscalYearTable)}
+      />
+      <Route
+        path="/setup/companysetup/add-fiscal-year"
+        element={withLayout(MainLayout, AddFiscalYear)}
+      />
+      <Route
+        path="/setup/companysetup/update-fiscal-year"
+        element={withLayout(MainLayout, UpdateFiscalYear)}
+      />
+      <Route
+        path="/setup/companysetup/tax-groups"
+        element={withLayout(MainLayout, TaxGroupsTable)}
+      />
+      <Route
+        path="/setup/companysetup/add-tax-groups"
+        element={withLayout(MainLayout, AddTaxGroupsForm)}
+      />
+      <Route
+        path="/setup/companysetup/update-tax-groups"
+        element={withLayout(MainLayout, UpdateTaxGroupsForm)}
+      />
+      <Route
+        path="/setup/companysetup/taxes"
+        element={withLayout(MainLayout, TaxTypesTable)}
+      />
+      <Route
+        path="/setup/companysetup/add-tax-types"
+        element={withLayout(MainLayout, AddTaxTypes)}
+      />
+      <Route
+        path="/setup/companysetup/update-tax-types"
+        element={withLayout(MainLayout, UpdateTaxTypes)}
+      />
+
+
+      <Route
+        path="/setup/miscellaneous"
+        element={withLayout(MainLayout, Miscellaneous)}
+      />
+      <Route
+        path="/setup/maintenance"
+        element={withLayout(MainLayout, SetupMaintenance)}
+      />
+      <Route
+        path="/setup/maintenance/install-chart-of-accounts"
+        element={withLayout(MainLayout, AddChartofAccounts)}
+      />
+
+      <Route
+        path="/dashboard"
+        element={withLayout(MainLayout, Dashboard)}
+      />
+
+    </Routes>
+  );
+};
+
+export default AppRoutes;
