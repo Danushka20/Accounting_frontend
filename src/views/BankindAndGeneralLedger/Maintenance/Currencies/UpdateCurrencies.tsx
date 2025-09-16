@@ -103,7 +103,7 @@ export default function UpdateCurrencies() {
         console.log("Updated currency:", updatedCurrency);
 
         queryClient.invalidateQueries({ queryKey: ["currencies"] });
-        navigate("/bankingandgeneralledger/maintenance/currencies"); // change to your currency list route
+        navigate("/bankingandgeneralledger/maintenance/currencies");
       } catch (err: any) {
         console.error("Error updating currency:", err);
         alert("Error updating currency: " + JSON.stringify(err));
