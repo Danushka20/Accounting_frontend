@@ -12,7 +12,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query"; // Add this import
+import { useQueryClient } from "@tanstack/react-query";
 import theme from "../../../../theme";
 import { getSalesType, updateSalesType, SalesType } from "../../../../api/SalesMaintenance/salesService";
 
@@ -31,8 +31,8 @@ export default function UpdateSalesTypesForm() {
   });
 
   const [errors, setErrors] = useState<Partial<SalesTypeFormData>>({});
-  const navigate = useNavigate(); // Add this
-  const queryClient = useQueryClient(); // Add this
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
@@ -84,11 +84,10 @@ export default function UpdateSalesTypesForm() {
           taxIncl: formData.taxIncluded,
         });
 
-        // Add these two lines to invalidate the cache
         queryClient.invalidateQueries({ queryKey: ["salesTypes"] });
         
         alert("Sales Type updated successfully!");
-        navigate("/sales/maintenance/sales-types"); // Use navigate instead of history.back
+        navigate("/sales/maintenance/sales-types");
       } catch (error) {
         console.error(error);
         alert("Failed to update Sales Type");
@@ -155,7 +154,7 @@ export default function UpdateSalesTypesForm() {
             gap: isMobile ? 2 : 0,
           }}
         >
-          <Button onClick={() => navigate(-1)}>Back</Button> {/* Updated this line */}
+          <Button onClick={() => navigate(-1)}>Back</Button>
 
           <Button
             variant="contained"

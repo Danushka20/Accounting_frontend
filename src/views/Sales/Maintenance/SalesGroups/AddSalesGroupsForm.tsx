@@ -10,6 +10,8 @@ import {
   useTheme,
 } from "@mui/material";
 import theme from "../../../../theme";
+import { createSalesGroup } from "../../../../api/SalesMaintenance/salesService";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface SalesGroupFormData {
   groupName: string;
@@ -21,9 +23,9 @@ export default function AddSalesGroupsForm() {
   });
 
   const [error, setError] = useState<string>("");
-
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
+  const queryClient = useQueryClient();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -39,10 +41,17 @@ export default function AddSalesGroupsForm() {
     return true;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validate()) {
-      console.log("Submitted Data:", formData);
-      alert("Sales Group added successfully!");
+      try {
+        await createSalesGroup({ name: formData.groupName });
+        queryClient.invalidateQueries({ queryKey: ["salesGroups"] });
+        alert("Sales Group added successfully!");
+        window.history.back();
+      } catch (error) {
+        console.error(error);
+        alert("Failed to add Sales Group");
+      }
     }
   };
 

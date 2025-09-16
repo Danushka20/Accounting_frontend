@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Stack,
@@ -10,20 +10,33 @@ import {
   useTheme,
 } from "@mui/material";
 import theme from "../../../../theme";
+import { getSalesGroup, updateSalesGroup } from "../../../../api/SalesMaintenance/salesService";
+import { useParams } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface SalesGroupFormData {
   groupName: string;
 }
 
 export default function UpdateSalesGroupsForm() {
+  const { id } = useParams<{ id: string }>();
   const [formData, setFormData] = useState<SalesGroupFormData>({
     groupName: "",
   });
 
   const [error, setError] = useState<string>("");
-
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
+
+  useEffect(() => {
+    if (!id) return;
+    getSalesGroup(Number(id))
+      .then((res) => setFormData({ groupName: res.name }))
+      .catch((err) => {
+        console.error(err);
+        alert("Failed to load Sales Group");
+      });
+  }, [id]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -39,10 +52,20 @@ export default function UpdateSalesGroupsForm() {
     return true;
   };
 
-  const handleSubmit = () => {
+  const queryClient = useQueryClient();
+
+  const handleSubmit = async () => {
+    if (!id) return;
     if (validate()) {
-      console.log("Submitted Data:", formData);
-      alert("Sales Group updated successfully!");
+      try {
+        await updateSalesGroup(Number(id), { name: formData.groupName });
+        queryClient.invalidateQueries({ queryKey: ["salesGroups"] });
+        alert("Sales Group updated successfully!");
+        window.history.back();
+      } catch (error) {
+        console.error(error);
+        alert("Failed to update Sales Group");
+      }
     }
   };
 
