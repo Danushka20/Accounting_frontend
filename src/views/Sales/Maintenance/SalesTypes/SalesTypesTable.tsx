@@ -21,13 +21,13 @@ import { useMemo, useState } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import Breadcrumb from "../../../../components/BreadCrumb";
 import PageTitle from "../../../../components/PageTitle";
 import theme from "../../../../theme";
 import SearchBar from "../../../../components/SearchBar";
-import { getSalesType, getSalesTypes } from "../../../../api/SalesMaintenance/salesService";
+import { getSalesType, getSalesTypes, deleteSalesType } from "../../../../api/SalesMaintenance/salesService";
 
 // Mock API function for Sales Types
 // const getSalesTypesList = async () => [
@@ -65,6 +65,7 @@ function SalesTypesTable() {
     const { data: salesTypesData = [] } = useQuery({
         queryKey: ["salesTypes"],
         queryFn: getSalesTypes,
+        refetchOnMount: true,
     });
 
     // Filter with search + inactive toggle
@@ -102,9 +103,20 @@ function SalesTypesTable() {
         setPage(0);
     };
 
-    const handleDelete = (id: number) => {
-        alert(`Delete Sales Type with id: ${id}`);
+    const queryClient = useQueryClient();
+
+    const handleDelete = async (id: number) => {
+        if (window.confirm("Are you sure you want to delete this Sales Type?")) {
+            try {
+                await deleteSalesType(id);
+                queryClient.invalidateQueries({ queryKey: ["salesTypes"] });
+            } catch (error) {
+                console.error("Error deleting sales type:", error);
+                alert("Failed to delete. Please try again.");
+            }
+        }
     };
+
 
     const breadcrumbItems = [
         { title: "Home", href: "/home" },
@@ -215,7 +227,7 @@ function SalesTypesTable() {
                                                     variant="contained"
                                                     size="small"
                                                     startIcon={<EditIcon />}
-                                                    onClick={() => navigate("/sales/maintenance/sales-areas/update-sales-types")}
+                                                    onClick={() => navigate(`/sales/maintenance/sales-areas/update-sales-types/${type.id}`)}
                                                 >
                                                     Edit
                                                 </Button>

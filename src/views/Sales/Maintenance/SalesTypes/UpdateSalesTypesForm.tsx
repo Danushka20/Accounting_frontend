@@ -11,7 +11,8 @@ import {
   useTheme,
   useMediaQuery,
 } from "@mui/material";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import theme from "../../../../theme";
 import { getSalesType, updateSalesType, SalesType } from "../../../../api/SalesMaintenance/salesService";
 
@@ -30,6 +31,8 @@ export default function UpdateSalesTypesForm() {
   });
 
   const [errors, setErrors] = useState<Partial<SalesTypeFormData>>({});
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
@@ -80,8 +83,11 @@ export default function UpdateSalesTypesForm() {
           factor: Number(formData.calculationFactor),
           taxIncl: formData.taxIncluded,
         });
+
+        queryClient.invalidateQueries({ queryKey: ["salesTypes"] });
+        
         alert("Sales Type updated successfully!");
-        window.history.back();
+        navigate("/sales/maintenance/sales-types");
       } catch (error) {
         console.error(error);
         alert("Failed to update Sales Type");
@@ -148,7 +154,7 @@ export default function UpdateSalesTypesForm() {
             gap: isMobile ? 2 : 0,
           }}
         >
-          <Button onClick={() => window.history.back()}>Back</Button>
+          <Button onClick={() => navigate(-1)}>Back</Button>
 
           <Button
             variant="contained"
