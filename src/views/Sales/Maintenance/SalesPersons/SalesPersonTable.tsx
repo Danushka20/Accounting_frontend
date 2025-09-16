@@ -57,9 +57,9 @@ function SalesPersonTable() {
 
     let filtered = salesPersons;
 
-    if (!showInactive) {
-      filtered = filtered.filter((item) => item.status === "Active");
-    }
+    // if (!showInactive) {
+    //   filtered = filtered.filter((item) => item.status === "Active");
+    // }
 
     if (searchQuery.trim()) {
       const lowerQuery = searchQuery.toLowerCase();
@@ -73,7 +73,9 @@ function SalesPersonTable() {
     }
 
     return filtered;
-  }, [salesPersons, searchQuery, showInactive]);
+  }, [salesPersons, searchQuery, 
+    // showInactive
+  ]);
 
   const paginatedSalesPersons = useMemo(() => {
     if (rowsPerPage === -1) return filteredSalesPersons;

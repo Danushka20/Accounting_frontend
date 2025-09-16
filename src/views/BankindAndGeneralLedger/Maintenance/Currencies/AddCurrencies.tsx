@@ -14,6 +14,7 @@ import {
 import theme from "../../../../theme";
 import { createCurrency } from "../../../../api/Currency/CurrencyApi";
 import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router";
 
 interface CurrenciesFormData {
   currencyAbbreviation: string;
@@ -38,6 +39,7 @@ export default function AddCurrencies() {
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -86,7 +88,6 @@ export default function AddCurrencies() {
 
         // Refresh currency list if you have a query
         queryClient.invalidateQueries({ queryKey: ["currencies"] });
-
         // Optional: reset form
         setFormData({
           currencyAbbreviation: "",
@@ -96,6 +97,9 @@ export default function AddCurrencies() {
           country: "",
           autoExchangeRateUpdate: false,
         });
+
+        navigate("/bankingandgeneralledger/maintenance/currencies");
+        
         setErrors({});
       } catch (err: any) {
         alert("Error creating currency: " + JSON.stringify(err));
