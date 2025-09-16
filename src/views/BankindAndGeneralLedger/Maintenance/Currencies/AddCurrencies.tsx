@@ -12,7 +12,7 @@ import {
   useTheme,
 } from "@mui/material";
 import theme from "../../../../theme";
-import { createCurrency } from "../../../../api/currencyApi";
+import { createCurrency } from "../../../../api/Currency/currencyApi";
 import { useNavigate } from "react-router";
 
 interface CurrenciesFormData {

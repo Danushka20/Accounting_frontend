@@ -18,6 +18,7 @@ import {
 import theme from "../../../../theme";
 import { createUser } from "../../../../api/UserManagement/userManagement";
 import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router";
 
 interface UserFormData {
   id: string;
@@ -49,7 +50,7 @@ export default function AddUserForm() {
   });
 
   const [errors, setErrors] = useState<Partial<UserFormData>>({});
-
+  const navigate = useNavigate();
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
   const queryClient = useQueryClient();
@@ -134,6 +135,7 @@ export default function AddUserForm() {
         //   role: "",
         //   status: "",
         // });
+        navigate("/setup/companysetup/user-account-setup");
         setErrors({});
       } catch (err: any) {
         alert("Error creating user: " + JSON.stringify(err));

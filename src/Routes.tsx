@@ -1082,7 +1082,7 @@ const AppRoutes = () => {
         element={withLayout(MainLayout, AddFiscalYear)}
       />
       <Route
-        path="/setup/companysetup/update-fiscal-year"
+        path="/setup/companysetup/update-fiscal-year/:id"
         element={withLayout(MainLayout, UpdateFiscalYear)}
       />
       <Route
