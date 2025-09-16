@@ -1,4 +1,3 @@
-// src/services/salesService.ts
 import axios from "axios";
 
 const API_URL = "http://localhost:8000/api/sales-types"; // Laravel API endpoint

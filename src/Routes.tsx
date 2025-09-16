@@ -809,7 +809,7 @@ const AppRoutes = () => {
         element={withLayout(MainLayout, AddSalesTypesForm)}
       />
       <Route
-        path="/sales/maintenance/sales-areas/update-sales-types"
+        path="/sales/maintenance/sales-areas/update-sales-types/:id"
         element={withLayout(MainLayout, UpdateSalesTypesForm)}
       />
       <Route
