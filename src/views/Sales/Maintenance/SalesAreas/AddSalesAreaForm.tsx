@@ -10,28 +10,30 @@ import {
   useTheme,
 } from "@mui/material";
 import theme from "../../../../theme";
+import { createSalesArea } from "../../../../api/SalesMaintenance/salesService";
+import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface SalesAreaFormData {
-  areaName: string;
+  name: string;
 }
 
 export default function AddSalesAreaForm() {
   const [formData, setFormData] = useState<SalesAreaFormData>({
-    areaName: "",
+    name: "",
   });
-
   const [error, setError] = useState<string>("");
-
-const muiTheme = useTheme();
+  const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
+  const navigate = useNavigate();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    setFormData({ areaName: value });
+    setFormData({ name: value });
   };
 
   const validate = () => {
-    if (!formData.areaName.trim()) {
+    if (!formData.name.trim()) {
       setError("Area Name is required");
       return false;
     }
@@ -39,10 +41,14 @@ const muiTheme = useTheme();
     return true;
   };
 
-  const handleSubmit = () => {
+  const queryClient = useQueryClient();
+
+  const handleSubmit = async () => {
     if (validate()) {
-      console.log("Submitted Data:", formData);
+      await createSalesArea(formData);
+      queryClient.invalidateQueries({ queryKey: ["salesAreas"] });
       alert("Sales Area added successfully!");
+      navigate("/sales/maintenance/sales-areas");
     }
   };
 
@@ -64,10 +70,10 @@ const muiTheme = useTheme();
         <Stack spacing={2}>
           <TextField
             label="Area Name"
-            name="areaName"
+            name="name"
             size="small"
             fullWidth
-            value={formData.areaName}
+            value={formData.name}
             onChange={handleInputChange}
             error={!!error}
             helperText={error}
@@ -75,7 +81,7 @@ const muiTheme = useTheme();
         </Stack>
 
         <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3, flexDirection: isMobile ? "column" : "row", gap: isMobile ? 2 : 0, }}>
-          <Button onClick={() => window.history.back()}>Back</Button>
+          <Button onClick={() => navigate(-1)}>Back</Button>
 
           <Button
             variant="contained"

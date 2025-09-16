@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import theme from "../../../../theme";
 import { getSalesGroup, updateSalesGroup } from "../../../../api/SalesMaintenance/salesService";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 
 interface SalesGroupFormData {
@@ -27,6 +27,7 @@ export default function UpdateSalesGroupsForm() {
   const [error, setError] = useState<string>("");
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!id) return;
@@ -61,7 +62,7 @@ export default function UpdateSalesGroupsForm() {
         await updateSalesGroup(Number(id), { name: formData.groupName });
         queryClient.invalidateQueries({ queryKey: ["salesGroups"] });
         alert("Sales Group updated successfully!");
-        window.history.back();
+        navigate("/sales/maintenance/sales-groups");
       } catch (error) {
         console.error(error);
         alert("Failed to update Sales Group");
