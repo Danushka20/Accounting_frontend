@@ -1000,7 +1000,7 @@ const AppRoutes = () => {
         element={withLayout(MainLayout, AddCurrencies)}
       />
       <Route
-        path="/bankingandgeneralledger/maintenance/update-currency"
+        path="/bankingandgeneralledger/maintenance/update-currency/:id"
         element={withLayout(MainLayout, UpdateCurrencies)}
       />
       <Route

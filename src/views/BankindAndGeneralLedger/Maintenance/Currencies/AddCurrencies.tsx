@@ -12,6 +12,8 @@ import {
   useTheme,
 } from "@mui/material";
 import theme from "../../../../theme";
+import { createCurrency } from "../../../../api/currencyApi";
+import { useNavigate } from "react-router";
 
 interface CurrenciesFormData {
   currencyAbbreviation: string;
@@ -35,6 +37,7 @@ export default function AddCurrencies() {
   const [errors, setErrors] = useState<Partial<CurrenciesFormData>>({});
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -65,10 +68,19 @@ export default function AddCurrencies() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validate()) {
-      console.log("Submitted Data:", formData);
-      alert("Form submitted successfully!");
+      await createCurrency({
+        currency_abbreviation: formData.currencyAbbreviation,
+        currency_symbol: formData.currencySymbol,
+        currency_name: formData.currencyName,
+        hundredths_name: formData.hundredthsName,
+        country: formData.country,
+        auto_exchange_rate_update: formData.autoExchangeRateUpdate,
+      } as any);
+
+      alert("Currency added successfully!");
+      navigate("/bankingandgeneralledger/maintenance/currencies");
     }
   };
 

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -17,37 +17,38 @@ import theme from "../../../../theme";
 import Breadcrumb from "../../../../components/BreadCrumb";
 import PageTitle from "../../../../components/PageTitle";
 import SearchBar from "../../../../components/SearchBar";
+import { getCurrencies, deleteCurrency } from "../../../../api/currencyApi";
 
 // Mock API function for currency data
-const getCurrencies = async () => [
-  {
-    id: 1,
-    currencyAbbreviation: "USD",
-    currencySymbol: "$",
-    currencyName: "US Dollar",
-    hundredthsName: "Cents",
-    country: "United States",
-    autoExchangeRateUpdate: true,
-  },
-  {
-    id: 2,
-    currencyAbbreviation: "LKR",
-    currencySymbol: "Rs",
-    currencyName: "Sri Lankan Rupee",
-    hundredthsName: "Cents",
-    country: "Sri Lanka",
-    autoExchangeRateUpdate: false,
-  },
-  {
-    id: 3,
-    currencyAbbreviation: "EUR",
-    currencySymbol: "€",
-    currencyName: "Euro",
-    hundredthsName: "Cents",
-    country: "European Union",
-    autoExchangeRateUpdate: true,
-  },
-];
+// const getCurrencies = async () => [
+//   {
+//     id: 1,
+//     currencyAbbreviation: "USD",
+//     currencySymbol: "$",
+//     currencyName: "US Dollar",
+//     hundredthsName: "Cents",
+//     country: "United States",
+//     autoExchangeRateUpdate: true,
+//   },
+//   {
+//     id: 2,
+//     currencyAbbreviation: "LKR",
+//     currencySymbol: "Rs",
+//     currencyName: "Sri Lankan Rupee",
+//     hundredthsName: "Cents",
+//     country: "Sri Lanka",
+//     autoExchangeRateUpdate: false,
+//   },
+//   {
+//     id: 3,
+//     currencyAbbreviation: "EUR",
+//     currencySymbol: "€",
+//     currencyName: "Euro",
+//     hundredthsName: "Cents",
+//     country: "European Union",
+//     autoExchangeRateUpdate: true,
+//   },
+// ];
 
 export default function CurrencyTable() {
   const [currencies, setCurrencies] = useState<any[]>([]);
@@ -59,9 +60,13 @@ export default function CurrencyTable() {
   const navigate = useNavigate();
 
   // Fetch data
-  useState(() => {
+  // useState(() => {
+  //   getCurrencies().then((data) => setCurrencies(data));
+  // });
+
+  useEffect(() => {
     getCurrencies().then((data) => setCurrencies(data));
-  });
+  }, []);
 
   // Filter based on autoExchangeRateUpdate and search
   const filteredData = useMemo(() => {
@@ -92,8 +97,11 @@ export default function CurrencyTable() {
     setPage(0);
   };
 
-  const handleDelete = (id: number) => {
-    alert(`Delete currency with id: ${id}`);
+  const handleDelete = async (id: number) => {
+    if (window.confirm("Are you sure you want to delete this currency?")) {
+      await deleteCurrency(id);
+      setCurrencies((prev) => prev.filter((c) => c.id !== id));
+    }
   };
 
   const breadcrumbItems = [
@@ -185,13 +193,13 @@ export default function CurrencyTable() {
               {paginatedData.length > 0 ? (
                 paginatedData.map((currency) => (
                   <TableRow key={currency.id} hover>
-                    <TableCell>{currency.currencyAbbreviation}</TableCell>
-                    <TableCell>{currency.currencySymbol}</TableCell>
-                    <TableCell>{currency.currencyName}</TableCell>
-                    <TableCell>{currency.hundredthsName}</TableCell>
+                    <TableCell>{currency.currency_abbreviation}</TableCell>
+                    <TableCell>{currency.currency_symbol}</TableCell>
+                    <TableCell>{currency.currency_name}</TableCell>
+                    <TableCell>{currency.hundredths_name}</TableCell>
                     <TableCell>{currency.country}</TableCell>
                     <TableCell align="center">
-                      <Checkbox checked={currency.autoExchangeRateUpdate} disabled />
+                      <Checkbox checked={currency.auto_exchange_rate_update} disabled />
                     </TableCell>
                     <TableCell align="center">
                       <Stack direction="row" spacing={1} justifyContent="center">
@@ -199,7 +207,7 @@ export default function CurrencyTable() {
                           variant="contained"
                           size="small"
                           startIcon={<EditIcon />}
-                          onClick={() => navigate("/bankingandgeneralledger/maintenance/update-currency")}
+                          onClick={() => navigate(`/bankingandgeneralledger/maintenance/update-currency/${currency.id}`)}
                         >
                           Edit
                         </Button>

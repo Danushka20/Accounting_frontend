@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Stack,
@@ -12,6 +12,8 @@ import {
   useTheme,
 } from "@mui/material";
 import theme from "../../../../theme";
+import { getCurrency, updateCurrency } from "../../../../api/currencyApi";
+import { useParams, useNavigate } from "react-router-dom";
 
 interface CurrenciesFormData {
   currencyAbbreviation: string;
@@ -25,6 +27,8 @@ interface CurrenciesFormData {
 export default function UpdateCurrencies() {
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState<CurrenciesFormData>({
     currencyAbbreviation: "",
@@ -36,6 +40,21 @@ export default function UpdateCurrencies() {
   });
 
   const [errors, setErrors] = useState<Partial<CurrenciesFormData>>({});
+
+  useEffect(() => {
+    if (id) {
+      getCurrency(Number(id)).then((data) =>
+        setFormData({
+          currencyAbbreviation: data.currency_abbreviation,
+          currencySymbol: data.currency_symbol,
+          currencyName: data.currency_name,
+          hundredthsName: data.hundredths_name || "",
+          country: data.country,
+          autoExchangeRateUpdate: data.auto_exchange_rate_update,
+        })
+      );
+    }
+  }, [id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -66,10 +85,19 @@ export default function UpdateCurrencies() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
-    if (validate()) {
-      console.log("Submitted Data:", formData);
-      alert("Form submitted successfully!");
+  const handleSubmit = async () => {
+    if (validate() && id) {
+      await updateCurrency(Number(id), {
+        currency_abbreviation: formData.currencyAbbreviation,
+        currency_symbol: formData.currencySymbol,
+        currency_name: formData.currencyName,
+        hundredths_name: formData.hundredthsName,
+        country: formData.country,
+        auto_exchange_rate_update: formData.autoExchangeRateUpdate,
+      } as any);
+
+      alert("Currency updated successfully!");
+      navigate("/bankingandgeneralledger/maintenance/currencies");
     }
   };
 
