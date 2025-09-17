@@ -1,6 +1,5 @@
 import axios from "axios";
 
-// Change the API URL to match your fiscal years endpoint
 const API_URL = "http://localhost:8000/api/fiscal-years";
 
 export const createFiscalYear = async (fiscalYearData: any) => {

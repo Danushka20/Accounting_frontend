@@ -12,12 +12,9 @@ import {
   useTheme,
 } from "@mui/material";
 import theme from "../../../../theme";
-
 import { getCurrency, updateCurrency } from "../../../../api/Currency/currencyApi";
 import { useParams, useNavigate } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
-import { getCurrency, updateCurrency } from "../../../../api/Currency/CurrencyApi";
-import { useNavigate, useParams } from "react-router";
+
 interface CurrenciesFormData {
   currencyAbbreviation: string;
   currencySymbol: string;
@@ -30,7 +27,6 @@ interface CurrenciesFormData {
 export default function UpdateCurrencies() {
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
-  const queryClient = useQueryClient();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
@@ -47,7 +43,6 @@ export default function UpdateCurrencies() {
 
   useEffect(() => {
     if (id) {
-
       getCurrency(Number(id)).then((data) =>
         setFormData({
           currencyAbbreviation: data.currency_abbreviation,
@@ -58,18 +53,6 @@ export default function UpdateCurrencies() {
           autoExchangeRateUpdate: data.auto_exchange_rate_update,
         })
       );
-
-      getCurrency(id).then((currency) => {
-        setFormData({
-          currencyAbbreviation: currency.currency_abbreviation,
-          currencySymbol: currency.currency_symbol,
-          currencyName: currency.currency_name,
-          hundredthsName: currency.hundredths_name,
-          country: currency.country,
-          autoExchangeRateUpdate: currency.auto_exchange_rate_update,
-        });
-      });
-
     }
   }, [id]);
 
@@ -132,7 +115,7 @@ export default function UpdateCurrencies() {
         console.log("Updated currency:", updatedCurrency);
 
         queryClient.invalidateQueries({ queryKey: ["currencies"] });
-        navigate("/bankingandgeneralledger/maintenance/currencies"); // change to your currency list route
+        navigate("/bankingandgeneralledger/maintenance/currencies");
       } catch (err: any) {
         console.error("Error updating currency:", err);
         alert("Error updating currency: " + JSON.stringify(err));

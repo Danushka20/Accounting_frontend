@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import theme from "../../../../theme";
 import { createSupplier } from "../../../../api/Supplier/SupplierApi";
+import { useNavigate } from "react-router";
 
 export default function SupplierGeneralSettingsForm() {
   const [formData, setFormData] = useState({
@@ -46,6 +47,7 @@ export default function SupplierGeneralSettingsForm() {
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const navigate = useNavigate();
 
   const handleChange = (field: string, value: string | boolean) => {
     setFormData({ ...formData, [field]: value });
@@ -159,6 +161,9 @@ export default function SupplierGeneralSettingsForm() {
         physicalAddress: "",
         generalNotes: "",
       })
+
+      navigate("/purchase/maintenance/suppliers");
+
     } catch (error: any) {
       console.error("Error creating supplier:", error);
       alert("Failed to save supplier. See console for details.");

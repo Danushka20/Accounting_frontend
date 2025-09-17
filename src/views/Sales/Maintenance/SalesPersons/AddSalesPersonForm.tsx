@@ -12,6 +12,7 @@ import {
 import theme from "../../../../theme";
 import { useQueryClient } from "@tanstack/react-query";
 import { createSalesPerson } from "../../../../api/SalesPerson/SalesPersonApi";
+import { useNavigate } from "react-router";
 
 interface SalesPersonFormData {
   name: string;
@@ -39,6 +40,7 @@ export default function AddSalesPerson() {
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -94,8 +96,11 @@ export default function AddSalesPerson() {
           turnoverBreakPoint: "",
           provision2: "",
         });
+
+        navigate("/sales/maintenance/sales-persons");
+
         setErrors({});
-      } catch (err: any){
+      } catch (err: any) {
         alert("Error creating sales person: " + JSON.stringify(err));
       }
     }
