@@ -17,7 +17,7 @@ import {
   FormControlLabel,
   Checkbox,
 } from "@mui/material";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -27,34 +27,10 @@ import Breadcrumb from "../../../../components/BreadCrumb";
 import PageTitle from "../../../../components/PageTitle";
 import theme from "../../../../theme";
 import SearchBar from "../../../../components/SearchBar";
-
-// Mock API function for salespersons
-const getSalesPersonList = async () => [
-  {
-    id: 1,
-    name: "John Doe",
-    telephone: "0112345678",
-    fax: "0118765432",
-    email: "john@example.com",
-    provision: "10",
-    turnoverBreakPoint: "50000",
-    provision2: "5",
-    status: "Active"
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    telephone: "0112233445",
-    fax: "0119988776",
-    email: "jane@example.com",
-    provision: "12",
-    turnoverBreakPoint: "60000",
-    provision2: "6",
-    status: "Inactive"
-  },
-];
+import { deleteSalesPerson, getSalesPerson, getSalesPersons } from "../../../../api/SalesPerson/SalesPersonApi";
 
 function SalesPersonTable() {
+  const [salesPersons, setSalesPersons] = useState<any[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchQuery, setSearchQuery] = useState("");
@@ -62,33 +38,42 @@ function SalesPersonTable() {
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
   const navigate = useNavigate();
 
-  const { data: salesPersons = [] } = useQuery({
-    queryKey: ["salesPersons"],
-    queryFn: getSalesPersonList,
-  });
+  const fetchSalesPersons = async () => {
+    try {
+      const data = await getSalesPersons();
+      setSalesPersons(data);
+    } catch (error) {
+      console.error("Failed to fetch sales persons:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchSalesPersons();
+  }, [])
+
 
   const filteredSalesPersons = useMemo(() => {
-  if (!salesPersons) return [];
+    if (!salesPersons) return [];
 
-  let filtered = salesPersons;
+    let filtered = salesPersons;
 
-  if (!showInactive) {
-    filtered = filtered.filter((item) => item.status === "Active");
-  }
+    if (!showInactive) {
+      filtered = filtered.filter((item) => item.status === "Active");
+    }
 
-  if (searchQuery.trim()) {
-    const lowerQuery = searchQuery.toLowerCase();
-    filtered = filtered.filter(
-      (sp) =>
-        sp.name.toLowerCase().includes(lowerQuery) ||
-        sp.telephone.toLowerCase().includes(lowerQuery) ||
-        sp.fax.toLowerCase().includes(lowerQuery) ||
-        sp.email.toLowerCase().includes(lowerQuery)
-    );
-  }
+    if (searchQuery.trim()) {
+      const lowerQuery = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (sp) =>
+          sp.name.toLowerCase().includes(lowerQuery) ||
+          sp.telephone.toLowerCase().includes(lowerQuery) ||
+          sp.fax.toLowerCase().includes(lowerQuery) ||
+          sp.email.toLowerCase().includes(lowerQuery)
+      );
+    }
 
-  return filtered;
-}, [salesPersons, searchQuery, showInactive]);
+    return filtered;
+  }, [salesPersons, searchQuery, showInactive]);
 
   const paginatedSalesPersons = useMemo(() => {
     if (rowsPerPage === -1) return filteredSalesPersons;
@@ -106,10 +91,17 @@ function SalesPersonTable() {
     setPage(0);
   };
 
-  const handleDelete = (id: number) => {
-    alert(`Delete sales person with id: ${id}`);
-  };
+  const handleDelete = async (id: number) => {
+    if (!window.confirm("Are you sure you want to delete this sales person?")) return;
 
+    try {
+      await deleteSalesPerson(id);
+      fetchSalesPersons();
+    } catch (error) {
+      console.error("Failed to delete sales person:", error);
+    }
+  };
+  
   const breadcrumbItems = [
     { title: "Home", href: "/home" },
     { title: "Sales Persons" },
@@ -214,7 +206,7 @@ function SalesPersonTable() {
                     <TableCell>{sp.fax}</TableCell>
                     <TableCell>{sp.email}</TableCell>
                     <TableCell>{sp.provision}</TableCell>
-                    <TableCell>{sp.turnoverBreakPoint}</TableCell>
+                    <TableCell>{sp.turnover_break_point}</TableCell>
                     <TableCell>{sp.provision2}</TableCell>
                     <TableCell align="center">
                       <Stack
@@ -227,7 +219,7 @@ function SalesPersonTable() {
                           size="small"
                           startIcon={<EditIcon />}
                           onClick={() =>
-                            navigate("/sales/maintenance/sales-persons/update-sales-person")
+                            navigate(`/sales/maintenance/sales-persons/update-sales-person/${sp.id}`)
                           }
                         >
                           Edit

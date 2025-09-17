@@ -1,11 +1,10 @@
 import axios from "axios";
 
-// Change the API URL to match your fiscal years endpoint
-const API_URL = "http://localhost:8000/api/fiscal-years";
+const API_URL = "http://localhost:8000/api/currencies"; 
 
-export const createFiscalYear = async (fiscalYearData: any) => {
+export const createCurrency = async (currencyData: any) => {
   try {
-    const response = await axios.post(API_URL, fiscalYearData);
+    const response = await axios.post(API_URL, currencyData);
     return response.data;
   } catch (error: any) {
     console.error(error.response?.data || error);
@@ -13,7 +12,7 @@ export const createFiscalYear = async (fiscalYearData: any) => {
   }
 };
 
-export const getFiscalYears = async () => {
+export const getCurrencies = async () => {
   try {
     const response = await axios.get(API_URL);
     return response.data;
@@ -23,7 +22,7 @@ export const getFiscalYears = async () => {
   }
 };
 
-export const getFiscalYear = async (id: string) => {
+export const getCurrency = async (id: string | number) => {
   try {
     const response = await axios.get(`${API_URL}/${id}`);
     return response.data;
@@ -33,9 +32,9 @@ export const getFiscalYear = async (id: string) => {
   }
 };
 
-export const updateFiscalYear = async (id: string, fiscalYearData: any) => {
+export const updateCurrency = async (id: string | number, currencyData: any) => {
   try {
-    const response = await axios.put(`${API_URL}/${id}`, fiscalYearData);
+    const response = await axios.put(`${API_URL}/${id}`, currencyData);
     return response.data;
   } catch (error: any) {
     console.error(error.response?.data || error);
@@ -43,7 +42,7 @@ export const updateFiscalYear = async (id: string, fiscalYearData: any) => {
   }
 };
 
-export const deleteFiscalYear = async (id: string | number) => {
+export const deleteCurrency = async (id: string | number) => {
   try {
     const response = await axios.delete(`${API_URL}/${id}`);
     return response.data;
@@ -51,5 +50,4 @@ export const deleteFiscalYear = async (id: string | number) => {
     console.error(error.response?.data || error);
     throw error.response?.data || error;
   }
- 
-}; 
+};

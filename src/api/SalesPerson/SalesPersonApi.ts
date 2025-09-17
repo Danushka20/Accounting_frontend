@@ -1,11 +1,10 @@
 import axios from "axios";
 
-// Change the API URL to match your fiscal years endpoint
-const API_URL = "http://localhost:8000/api/fiscal-years";
+const API_URL = "http://localhost:8000/api/sales-persons"; 
 
-export const createFiscalYear = async (fiscalYearData: any) => {
+export const createSalesPerson = async (salesPersonData: any) => {
   try {
-    const response = await axios.post(API_URL, fiscalYearData);
+    const response = await axios.post(API_URL, salesPersonData);
     return response.data;
   } catch (error: any) {
     console.error(error.response?.data || error);
@@ -13,7 +12,7 @@ export const createFiscalYear = async (fiscalYearData: any) => {
   }
 };
 
-export const getFiscalYears = async () => {
+export const getSalesPersons = async () => {
   try {
     const response = await axios.get(API_URL);
     return response.data;
@@ -23,7 +22,7 @@ export const getFiscalYears = async () => {
   }
 };
 
-export const getFiscalYear = async (id: string) => {
+export const getSalesPerson = async (id: string | number) => {
   try {
     const response = await axios.get(`${API_URL}/${id}`);
     return response.data;
@@ -33,9 +32,9 @@ export const getFiscalYear = async (id: string) => {
   }
 };
 
-export const updateFiscalYear = async (id: string, fiscalYearData: any) => {
+export const updateSalesPerson = async (id: string | number, salesPersonData: any) => {
   try {
-    const response = await axios.put(`${API_URL}/${id}`, fiscalYearData);
+    const response = await axios.put(`${API_URL}/${id}`, salesPersonData);
     return response.data;
   } catch (error: any) {
     console.error(error.response?.data || error);
@@ -43,7 +42,7 @@ export const updateFiscalYear = async (id: string, fiscalYearData: any) => {
   }
 };
 
-export const deleteFiscalYear = async (id: string | number) => {
+export const deleteSalesPerson = async (id: string | number) => {
   try {
     const response = await axios.delete(`${API_URL}/${id}`);
     return response.data;
@@ -51,5 +50,4 @@ export const deleteFiscalYear = async (id: string | number) => {
     console.error(error.response?.data || error);
     throw error.response?.data || error;
   }
- 
-}; 
+};
