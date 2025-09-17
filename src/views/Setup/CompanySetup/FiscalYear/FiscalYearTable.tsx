@@ -41,8 +41,8 @@ function FiscalYearTable() {
 
   const filteredData = useMemo(() => {
     return fiscalYears.filter((fy) => {
-      const begin = fy.fiscalYearBegin ?? "";
-      const end = fy.fiscalYearEnd ?? "";
+      const begin = fy.fiscal_year_from ?? "";
+      const end = fy.fiscal_year_to ?? "";
       const closed = fy.isClosed ? "yes" : "no";
 
       return (

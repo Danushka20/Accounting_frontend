@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 import theme from "../../../../theme";
 import Breadcrumb from "../../../../components/BreadCrumb";
 import PageTitle from "../../../../components/PageTitle";
-import SearchBar from "../../../../components/SearchBar"
+import SearchBar from "../../../../components/SearchBar";
 import { getCurrencies, deleteCurrency } from "../../../../api/Currency/currencyApi";
 
 // Mock API function for currency data
@@ -50,9 +50,7 @@ import { getCurrencies, deleteCurrency } from "../../../../api/Currency/currency
 //   },
 // ];
 
-import { getCurrencies, deleteCurrency } from "../../../../api/Currency/CurrencyApi";
-
-export default function CurrencyTable() {
+export default function CurrenciesTable() {
   const [currencies, setCurrencies] = useState<any[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -62,7 +60,6 @@ export default function CurrencyTable() {
   const navigate = useNavigate();
 
   // Fetch data
-
   // useState(() => {
   //   getCurrencies().then((data) => setCurrencies(data));
   // });
@@ -71,22 +68,9 @@ export default function CurrencyTable() {
     getCurrencies().then((data) => setCurrencies(data));
   }, []);
 
-  const fetchCurrencies = async () => {
-    try {
-      const data = await getCurrencies();
-      setCurrencies(data);
-    } catch (error) {
-      console.error("Failed to fetch currencies:", error);
-    }
-  };
-
-
-  useEffect(() => {
-    fetchCurrencies();
-  }, [])
   // Filter based on autoExchangeRateUpdate and search
   const filteredData = useMemo(() => {
-    let data = showAll ? currencies : currencies.filter((c) => c.autoExchangeRateUpdate);
+    let data = showAll ? currencies : currencies.filter((c) => c.auto_exchange_rate_update);
 
     if (searchQuery.trim() !== "") {
       const lower = searchQuery.toLowerCase();
@@ -114,23 +98,11 @@ export default function CurrencyTable() {
   };
 
   const handleDelete = async (id: number) => {
-
     if (window.confirm("Are you sure you want to delete this currency?")) {
       await deleteCurrency(id);
       setCurrencies((prev) => prev.filter((c) => c.id !== id));
     }
   };
-
-      if (!window.confirm("Are you sure you want to delete this sales person?")) return;
-  
-      try {
-        await deleteCurrency(id);
-        fetchCurrencies();
-      } catch (error) {
-        console.error("Failed to delete sales person:", error);
-      }
-    };
-
 
   const breadcrumbItems = [
     { title: "Home", href: "/home" },

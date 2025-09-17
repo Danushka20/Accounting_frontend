@@ -27,7 +27,7 @@ import Breadcrumb from "../../../../components/BreadCrumb";
 import PageTitle from "../../../../components/PageTitle";
 import theme from "../../../../theme";
 import SearchBar from "../../../../components/SearchBar";
-import { getSalesType, getSalesTypes, deleteSalesType } from "../../../../api/SalesMaintenance/salesService";
+import { getSalesTypes, deleteSalesType } from "../../../../api/SalesMaintenance/salesService";
 
 // Mock API function for Sales Types
 // const getSalesTypesList = async () => [
@@ -155,7 +155,7 @@ function SalesTypesTable() {
                     <Button
                         variant="outlined"
                         startIcon={<ArrowBackIcon />}
-                        onClick={() => navigate(-1)}
+                        onClick={() => navigate("/sales/maintenance")}
                     >
                         Back
                     </Button>
