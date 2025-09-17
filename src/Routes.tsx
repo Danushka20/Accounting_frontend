@@ -774,7 +774,7 @@ const AppRoutes = () => {
         element={withLayout(MainLayout, AddSalesGroupsForm)}
       />
       <Route
-        path="/sales/maintenance/sales-groups/update-sales-groups"
+        path="/sales/maintenance/sales-groups/update-sales-groups/:id"
         element={withLayout(MainLayout, UpdateSalesGroupsForm)}
       />
       <Route
@@ -797,7 +797,7 @@ const AppRoutes = () => {
         element={withLayout(MainLayout, AddSalesAreaForm)}
       />
       <Route
-        path="/sales/maintenance/sales-areas/update-sales-area"
+        path="/sales/maintenance/sales-areas/update-sales-area/:id"
         element={withLayout(MainLayout, UpdateSalesAreaForm)}
       />
       <Route
@@ -809,7 +809,7 @@ const AppRoutes = () => {
         element={withLayout(MainLayout, AddSalesTypesForm)}
       />
       <Route
-        path="/sales/maintenance/sales-areas/update-sales-types"
+        path="/sales/maintenance/sales-areas/update-sales-types/:id"
         element={withLayout(MainLayout, UpdateSalesTypesForm)}
       />
       <Route

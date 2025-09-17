@@ -21,22 +21,13 @@ import { useMemo, useState } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import Breadcrumb from "../../../../components/BreadCrumb";
 import PageTitle from "../../../../components/PageTitle";
 import theme from "../../../../theme";
 import SearchBar from "../../../../components/SearchBar";
-
-// Mock API function
-const getSalesAreaList = async () => [
-  { id: 1, areaName: "Colombo", status: "Active" },
-  { id: 2, areaName: "Gampaha", status: "Active" },
-  { id: 3, areaName: "Kandy", status: "Inactive" },
-  { id: 4, areaName: "Galle", status: "Active" },
-  { id: 5, areaName: "Kurunegala", status: "Inactive" },
-  { id: 6, areaName: "Matara", status: "Active" },
-];
+import { getSalesAreas, deleteSalesArea, SalesArea } from "../../../../api/SalesMaintenance/salesService";
 
 function SalesAreaTable() {
   const [page, setPage] = useState(0);
@@ -45,10 +36,12 @@ function SalesAreaTable() {
   const [showInactive, setShowInactive] = useState(false);
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-  const { data: salesAreas = [] } = useQuery({
+  const { data: salesAreas = [] } = useQuery<SalesArea[]>({
     queryKey: ["salesAreas"],
-    queryFn: getSalesAreaList,
+    queryFn: getSalesAreas,
+    refetchOnMount: true,
   });
 
   const filteredAreas = useMemo(() => {
@@ -56,17 +49,17 @@ function SalesAreaTable() {
 
     let filtered = salesAreas;
 
-    if (!showInactive) {
-      filtered = filtered.filter((item) => item.status === "Active");
-    }
+    // if (!showInactive) {
+    //   filtered = filtered.filter((item) => item.status === "Active");
+    // }
 
-    if (!searchQuery.trim()) {
+    if (searchQuery.trim()) {
       const lowerQuery = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (area) =>
-          area.areaName.toLowerCase().includes(lowerQuery)
+      filtered = filtered.filter((area) =>
+        area.name.toLowerCase().includes(lowerQuery)
       );
     }
+
     return filtered;
   }, [salesAreas, searchQuery, showInactive]);
 
@@ -86,8 +79,16 @@ function SalesAreaTable() {
     setPage(0);
   };
 
-  const handleDelete = (id: number) => {
-    alert(`Delete area with id: ${id}`);
+  const handleDelete = async (id: number) => {
+    if (window.confirm("Are you sure you want to delete this area?")) {
+      try {
+          await deleteSalesArea(id);
+          queryClient.invalidateQueries({ queryKey: ["salesAreas"] });
+      } catch (error) {
+          console.error("Error deleting sales type:", error);
+          alert("Failed to delete. Please try again.");
+      }
+    }
   };
 
   const breadcrumbItems = [
@@ -126,14 +127,13 @@ function SalesAreaTable() {
           <Button
             variant="outlined"
             startIcon={<ArrowBackIcon />}
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/sales/maintenance")}
           >
             Back
           </Button>
         </Stack>
       </Box>
 
-      {/* Search Bar */}
       <Box
         sx={{
           display: "flex",
@@ -183,7 +183,7 @@ function SalesAreaTable() {
                 paginatedAreas.map((area, index) => (
                   <TableRow key={area.id} hover>
                     <TableCell>{page * rowsPerPage + index + 1}</TableCell>
-                    <TableCell>{area.areaName}</TableCell>
+                    <TableCell>{area.name}</TableCell>
                     <TableCell align="center">
                       <Stack
                         direction="row"
@@ -195,10 +195,7 @@ function SalesAreaTable() {
                           size="small"
                           startIcon={<EditIcon />}
                           onClick={() =>
-                            navigate(
-                              "/sales/maintenance/sales-areas/update-sales-area"
-                              // `/sales/maintenance/sales-areas/update-sales-area/${area.id}`
-                              )
+                            navigate(`/sales/maintenance/sales-areas/update-sales-area/${area.id}`)
                           }
                         >
                           Edit
@@ -208,7 +205,7 @@ function SalesAreaTable() {
                           size="small"
                           color="error"
                           startIcon={<DeleteIcon />}
-                          onClick={() => handleDelete(area.id)}
+                          onClick={() => handleDelete(area.id!)}
                         >
                           Delete
                         </Button>

@@ -21,37 +21,38 @@ import { useMemo, useState } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import Breadcrumb from "../../../../components/BreadCrumb";
 import PageTitle from "../../../../components/PageTitle";
 import theme from "../../../../theme";
 import SearchBar from "../../../../components/SearchBar";
+import { getSalesTypes, deleteSalesType } from "../../../../api/SalesMaintenance/salesService";
 
 // Mock API function for Sales Types
-const getSalesTypesList = async () => [
-    {
-        id: 1,
-        typeName: "Retail",
-        factor: 1.0,
-        taxIncl: true,
-        status: "Active",
-    },
-    {
-        id: 2,
-        typeName: "Wholesale",
-        factor: 0.9,
-        taxIncl: false,
-        status: "Inactive",
-    },
-    {
-        id: 3,
-        typeName: "Export",
-        factor: 1.2,
-        taxIncl: true,
-        status: "Active",
-    },
-];
+// const getSalesTypesList = async () => [
+//     {
+//         id: 1,
+//         typeName: "Retail",
+//         factor: 1.0,
+//         taxIncl: true,
+//         status: "Active",
+//     },
+//     {
+//         id: 2,
+//         typeName: "Wholesale",
+//         factor: 0.9,
+//         taxIncl: false,
+//         status: "Inactive",
+//     },
+//     {
+//         id: 3,
+//         typeName: "Export",
+//         factor: 1.2,
+//         taxIncl: true,
+//         status: "Active",
+//     },
+// ];
 
 function SalesTypesTable() {
     const [page, setPage] = useState(0);
@@ -63,7 +64,8 @@ function SalesTypesTable() {
 
     const { data: salesTypesData = [] } = useQuery({
         queryKey: ["salesTypes"],
-        queryFn: getSalesTypesList,
+        queryFn: getSalesTypes,
+        refetchOnMount: true,
     });
 
     // Filter with search + inactive toggle
@@ -101,9 +103,20 @@ function SalesTypesTable() {
         setPage(0);
     };
 
-    const handleDelete = (id: number) => {
-        alert(`Delete Sales Type with id: ${id}`);
+    const queryClient = useQueryClient();
+
+    const handleDelete = async (id: number) => {
+        if (window.confirm("Are you sure you want to delete this Sales Type?")) {
+            try {
+                await deleteSalesType(id);
+                queryClient.invalidateQueries({ queryKey: ["salesTypes"] });
+            } catch (error) {
+                console.error("Error deleting sales type:", error);
+                alert("Failed to delete. Please try again.");
+            }
+        }
     };
+
 
     const breadcrumbItems = [
         { title: "Home", href: "/home" },
@@ -142,7 +155,7 @@ function SalesTypesTable() {
                     <Button
                         variant="outlined"
                         startIcon={<ArrowBackIcon />}
-                        onClick={() => navigate(-1)}
+                        onClick={() => navigate("/sales/maintenance")}
                     >
                         Back
                     </Button>
@@ -214,7 +227,7 @@ function SalesTypesTable() {
                                                     variant="contained"
                                                     size="small"
                                                     startIcon={<EditIcon />}
-                                                    onClick={() => navigate("/sales/maintenance/sales-areas/update-sales-types")}
+                                                    onClick={() => navigate(`/sales/maintenance/sales-areas/update-sales-types/${type.id}`)}
                                                 >
                                                     Edit
                                                 </Button>

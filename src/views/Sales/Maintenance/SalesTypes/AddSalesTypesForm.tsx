@@ -12,6 +12,9 @@ import {
   useTheme,
 } from "@mui/material";
 import theme from "../../../../theme";
+import { createSalesType } from "../../../../api/SalesMaintenance/salesService";
+import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router";
 
 interface SalesTypeFormData {
   salesTypeName: string;
@@ -53,12 +56,29 @@ export default function AddSalesTypesForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const handleSubmit = async () => {
     if (validate()) {
-      console.log("Submitted Data:", formData);
-      alert("Sales Type added successfully!");
+      try {
+        await createSalesType({
+          typeName: formData.salesTypeName,
+          factor: Number(formData.calculationFactor),
+          taxIncl: formData.taxIncluded,
+        });
+
+        queryClient.invalidateQueries({ queryKey: ["salesTypes"] });
+        
+        alert("Sales Type added successfully!");
+        navigate("/sales/maintenance/sales-types"); // Navigate directly instead of using history.back
+      } catch (error) {
+        console.error(error);
+        alert("Failed to add Sales Type");
+      }
     }
   };
+
 
   return (
     <Stack alignItems="center" sx={{ mt: 4, px: isMobile ? 2 : 0 }}>

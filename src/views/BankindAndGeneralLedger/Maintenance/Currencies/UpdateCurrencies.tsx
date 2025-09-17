@@ -12,9 +12,9 @@ import {
   useTheme,
 } from "@mui/material";
 import theme from "../../../../theme";
-import { useQueryClient } from "@tanstack/react-query";
-import { getCurrency, updateCurrency } from "../../../../api/Currency/CurrencyApi";
-import { useNavigate, useParams } from "react-router";
+import { getCurrency, updateCurrency } from "../../../../api/Currency/currencyApi";
+import { useParams, useNavigate } from "react-router-dom";
+
 interface CurrenciesFormData {
   currencyAbbreviation: string;
   currencySymbol: string;
@@ -27,7 +27,6 @@ interface CurrenciesFormData {
 export default function UpdateCurrencies() {
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
-  const queryClient = useQueryClient();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
@@ -44,16 +43,16 @@ export default function UpdateCurrencies() {
 
   useEffect(() => {
     if (id) {
-      getCurrency(id).then((currency) => {
+      getCurrency(Number(id)).then((data) =>
         setFormData({
-          currencyAbbreviation: currency.currency_abbreviation,
-          currencySymbol: currency.currency_symbol,
-          currencyName: currency.currency_name,
-          hundredthsName: currency.hundredths_name,
-          country: currency.country,
-          autoExchangeRateUpdate: currency.auto_exchange_rate_update,
-        });
-      });
+          currencyAbbreviation: data.currency_abbreviation,
+          currencySymbol: data.currency_symbol,
+          currencyName: data.currency_name,
+          hundredthsName: data.hundredths_name || "",
+          country: data.country,
+          autoExchangeRateUpdate: data.auto_exchange_rate_update,
+        })
+      );
     }
   }, [id]);
 
@@ -88,6 +87,19 @@ export default function UpdateCurrencies() {
 
   const handleSubmit = async () => {
     if (validate() && id) {
+
+      await updateCurrency(Number(id), {
+        currency_abbreviation: formData.currencyAbbreviation,
+        currency_symbol: formData.currencySymbol,
+        currency_name: formData.currencyName,
+        hundredths_name: formData.hundredthsName,
+        country: formData.country,
+        auto_exchange_rate_update: formData.autoExchangeRateUpdate,
+      } as any);
+
+      alert("Currency updated successfully!");
+      navigate("/bankingandgeneralledger/maintenance/currencies");
+
       try {
         const payload = {
           currency_abbreviation: formData.currencyAbbreviation,
@@ -108,6 +120,7 @@ export default function UpdateCurrencies() {
         console.error("Error updating currency:", err);
         alert("Error updating currency: " + JSON.stringify(err));
       }
+
     }
   };
 

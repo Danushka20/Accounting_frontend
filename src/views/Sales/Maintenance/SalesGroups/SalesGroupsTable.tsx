@@ -21,19 +21,13 @@ import { useMemo, useState } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import Breadcrumb from "../../../../components/BreadCrumb";
 import PageTitle from "../../../../components/PageTitle";
 import theme from "../../../../theme";
 import SearchBar from "../../../../components/SearchBar";
-
-// Mock API function
-const getSalesGroupList = async () => [
-  { name: "Large", status: "Active" },
-  { name: "Small", status: "Active" },
-  { name: "Medium", status: "Inactive" },
-];
+import { getSalesGroups, deleteSalesGroup, SalesGroup } from "../../../../api/SalesMaintenance/salesService";
 
 function SalesGroupsTable() {
   const [page, setPage] = useState(0);
@@ -42,10 +36,12 @@ function SalesGroupsTable() {
   const [showInactive, setShowInactive] = useState(false);
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-  const { data: salesGroups = [] } = useQuery({
+  const { data: salesGroups = [] } = useQuery<SalesGroup[]>({
     queryKey: ["salesGroups"],
-    queryFn: getSalesGroupList,
+    queryFn: getSalesGroups,
+    refetchOnMount: true,
   });
 
   const filteredGroups = useMemo(() => {
@@ -53,9 +49,9 @@ function SalesGroupsTable() {
 
     let filtered = salesGroups;
 
-    if (!showInactive) {
-      filtered = filtered.filter((item) => item.status === "Active");
-    }
+    // if (!showInactive) {
+    //   filtered = filtered.filter((item) => item.status === "Active" || !item.status);
+    // }
 
     if (searchQuery.trim()) {
       const lowerQuery = searchQuery.toLowerCase();
@@ -82,8 +78,17 @@ function SalesGroupsTable() {
     setPage(0);
   };
 
-  const handleDelete = (index: number) => {
-    alert(`Delete group at index: ${index}`);
+  const handleDelete = async (id?: number) => {
+    if (!id) return;
+    if (window.confirm("Are you sure you want to delete this Sales Group?")) {
+      try {
+        await deleteSalesGroup(id);
+        queryClient.invalidateQueries({ queryKey: ["salesGroups"] });
+      } catch (error) {
+        console.error(error);
+        alert("Failed to delete. Please try again.");
+      }
+    }
   };
 
   const breadcrumbItems = [
@@ -124,7 +129,7 @@ function SalesGroupsTable() {
           <Button
             variant="outlined"
             startIcon={<ArrowBackIcon />}
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/sales/maintenance")}
           >
             Back
           </Button>
@@ -179,7 +184,7 @@ function SalesGroupsTable() {
             <TableBody>
               {paginatedGroups.length > 0 ? (
                 paginatedGroups.map((group, index) => (
-                  <TableRow key={index} hover>
+                  <TableRow key={group.id || index} hover>
                     <TableCell>{page * rowsPerPage + index + 1}</TableCell>
                     <TableCell>{group.name}</TableCell>
                     <TableCell align="center">
@@ -189,10 +194,7 @@ function SalesGroupsTable() {
                           size="small"
                           startIcon={<EditIcon />}
                           onClick={() =>
-                            navigate(
-                              "/sales/maintenance/sales-groups/update-sales-groups"
-                              // `/sales/maintenance/sales-groups/update-sales-group/${page * rowsPerPage + index}`
-                            )
+                            navigate(`/sales/maintenance/sales-groups/update-sales-groups/${group.id}`)
                           }
                         >
                           Edit
@@ -202,7 +204,7 @@ function SalesGroupsTable() {
                           size="small"
                           color="error"
                           startIcon={<DeleteIcon />}
-                          onClick={() => handleDelete(index)}
+                          onClick={() => handleDelete(group.id)}
                         >
                           Delete
                         </Button>
