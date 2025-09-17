@@ -16,7 +16,40 @@ import { useNavigate } from "react-router-dom";
 import theme from "../../../../theme";
 import Breadcrumb from "../../../../components/BreadCrumb";
 import PageTitle from "../../../../components/PageTitle";
-import SearchBar from "../../../../components/SearchBar";
+import SearchBar from "../../../../components/SearchBar"
+import { getCurrencies, deleteCurrency } from "../../../../api/Currency/currencyApi";
+
+// Mock API function for currency data
+// const getCurrencies = async () => [
+//   {
+//     id: 1,
+//     currencyAbbreviation: "USD",
+//     currencySymbol: "$",
+//     currencyName: "US Dollar",
+//     hundredthsName: "Cents",
+//     country: "United States",
+//     autoExchangeRateUpdate: true,
+//   },
+//   {
+//     id: 2,
+//     currencyAbbreviation: "LKR",
+//     currencySymbol: "Rs",
+//     currencyName: "Sri Lankan Rupee",
+//     hundredthsName: "Cents",
+//     country: "Sri Lanka",
+//     autoExchangeRateUpdate: false,
+//   },
+//   {
+//     id: 3,
+//     currencyAbbreviation: "EUR",
+//     currencySymbol: "€",
+//     currencyName: "Euro",
+//     hundredthsName: "Cents",
+//     country: "European Union",
+//     autoExchangeRateUpdate: true,
+//   },
+// ];
+
 import { getCurrencies, deleteCurrency } from "../../../../api/Currency/CurrencyApi";
 
 export default function CurrencyTable() {
@@ -29,6 +62,15 @@ export default function CurrencyTable() {
   const navigate = useNavigate();
 
   // Fetch data
+
+  // useState(() => {
+  //   getCurrencies().then((data) => setCurrencies(data));
+  // });
+
+  useEffect(() => {
+    getCurrencies().then((data) => setCurrencies(data));
+  }, []);
+
   const fetchCurrencies = async () => {
     try {
       const data = await getCurrencies();
@@ -37,6 +79,7 @@ export default function CurrencyTable() {
       console.error("Failed to fetch currencies:", error);
     }
   };
+
 
   useEffect(() => {
     fetchCurrencies();
@@ -71,6 +114,13 @@ export default function CurrencyTable() {
   };
 
   const handleDelete = async (id: number) => {
+
+    if (window.confirm("Are you sure you want to delete this currency?")) {
+      await deleteCurrency(id);
+      setCurrencies((prev) => prev.filter((c) => c.id !== id));
+    }
+  };
+
       if (!window.confirm("Are you sure you want to delete this sales person?")) return;
   
       try {
@@ -80,6 +130,7 @@ export default function CurrencyTable() {
         console.error("Failed to delete sales person:", error);
       }
     };
+
 
   const breadcrumbItems = [
     { title: "Home", href: "/home" },
@@ -176,7 +227,7 @@ export default function CurrencyTable() {
                     <TableCell>{currency.hundredths_name}</TableCell>
                     <TableCell>{currency.country}</TableCell>
                     <TableCell align="center">
-                      <Checkbox checked={currency.autoExchangeRateUpdate} disabled />
+                      <Checkbox checked={currency.auto_exchange_rate_update} disabled />
                     </TableCell>
                     <TableCell align="center">
                       <Stack direction="row" spacing={1} justifyContent="center">

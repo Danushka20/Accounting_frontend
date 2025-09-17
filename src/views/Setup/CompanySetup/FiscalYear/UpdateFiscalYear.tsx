@@ -13,6 +13,9 @@ import {
 import { useForm, Controller } from "react-hook-form";
 import { getFiscalYear, updateFiscalYear } from "../../../../api/FiscalYear/FiscalYearApi";
 import { useQueryClient } from "@tanstack/react-query";
+
+import { useNavigate, useParams } from "react-router-dom";
+
 import { useParams } from "react-router-dom";
 interface FiscalYearFormData {
     fiscalYearFrom: string;
@@ -20,7 +23,11 @@ interface FiscalYearFormData {
 }
 
 interface Props {
+
+    id: string;
+
   id: string;
+
 }
 
 export default function UpdateFiscalYear() {
@@ -28,6 +35,9 @@ export default function UpdateFiscalYear() {
     const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
     const queryClient = useQueryClient();
     const { id } = useParams<{ id: string }>();
+
+    const navigate = useNavigate();
+
 
     const {
         control,
@@ -44,6 +54,39 @@ export default function UpdateFiscalYear() {
 
     const fiscalYearFrom = watch("fiscalYearFrom");
 
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const data = await getFiscalYear(id);
+                reset({
+                    fiscalYearFrom: data.fiscal_year_from,
+                    fiscalYearTo: data.fiscal_year_to,
+                });
+            } catch (err) {
+                alert("Error fetching fiscal year data: " + JSON.stringify(err));
+            }
+        };
+        fetchData();
+    }, [id, reset]);
+
+    const onSubmit = async (data: FiscalYearFormData) => {
+        try {
+            const payload = {
+                fiscal_year_from: data.fiscalYearFrom,
+                fiscal_year_to: data.fiscalYearTo,
+            };
+
+            const updated = await updateFiscalYear(id, payload);
+            console.log("Fiscal Year updated:", updated);
+            alert("Fiscal Year updated successfully!");
+            queryClient.invalidateQueries({ queryKey: ["fiscalYears"] });
+            queryClient.refetchQueries({ queryKey: ["fiscalYears"] });
+            navigate("/setup/companysetup/fiscal-years");
+        } catch (err: any) {
+            alert("Error updating fiscal year: " + JSON.stringify(err));
+        }
+
       useEffect(() => {
     const fetchData = async () => {
       try {
@@ -55,6 +98,7 @@ export default function UpdateFiscalYear() {
       } catch (err) {
         alert("Error fetching fiscal year data: " + JSON.stringify(err));
       }
+
     };
     fetchData();
   }, [id, reset]);

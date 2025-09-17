@@ -51,4 +51,5 @@ export const deleteFiscalYear = async (id: string | number) => {
     console.error(error.response?.data || error);
     throw error.response?.data || error;
   }
-};
+ 
+}; 
