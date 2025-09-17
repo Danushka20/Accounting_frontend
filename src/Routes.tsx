@@ -7,7 +7,6 @@ import { PermissionKeys } from "./views/Administration/SectionList";
 import PermissionDenied from "./components/PermissionDenied";
 import { useQuery } from "@tanstack/react-query";
 import { User, validateUser } from "./api/userApi";
-import { AuditCalendar } from "./views/AuditAndInspection/Calendar/Calendar";
 import Maintenance from "./views/Sales/Maintenance/SalesMaintenance";
 import InquiriesAndReports from "./views/Sales/InquiriesAndReports/SalesInquiriesAndReports";
 import SalesQuotationEntry from "./views/Sales/Transactions/SalesQuotationEntry";
@@ -146,87 +145,7 @@ const DocumentRegister = React.lazy(
   () => import("./views/DocumentsPage/DocumentsTable")
 );
 
-//audit and inspection
-const InternalAuditTable = React.lazy(
-  () => import("./views/AuditAndInspection/InternalAudit/InternalAuditTable")
-);
 
-const AuditBuilderTable = React.lazy(
-  () => import("./views/AuditAndInspection/AuditBuilder/AuditBuilderTable")
-);
-
-//hazard and risk
-const HazardRiskDashboard = React.lazy(
-  () => import("./views/HazardAndRisk/Dashboard")
-);
-const HazardRiskTable = React.lazy(
-  () => import("./views/HazardAndRisk/HazardRiskTable")
-);
-
-//Occupational Health
-
-//Dashboard
-const OccupationalHealthDashboard = React.lazy(
-  () => import("./views/OccupationalHealth/OccupationalHealthDashboard")
-);
-
-//Patient Register
-const PatientTable = React.lazy(
-  () => import("./views/OccupationalHealth/ClinicalSuite/PatientTable")
-);
-
-//Medicine Stock
-const MedicineStockTable = React.lazy(
-  () => import("./views/OccupationalHealth/ClinicalSuite/MedicineStockTable")
-);
-
-//Medicine Request
-const MedicineRequestTable = React.lazy(
-  () =>
-    import(
-      "./views/OccupationalHealth/MedicineInventory/MedicineRequest/MedicineRequestTable"
-    )
-);
-
-//Medicine Inventory
-const PurchaseAndInventoryTable = React.lazy(
-  () =>
-    import(
-      "./views/OccupationalHealth/MedicineInventory/PurchaseAndInventory/PurchaseAndInventoryTable"
-    )
-);
-
-const PurchaseAndInventoryTransactionTable = React.lazy(
-  () => import("./views/OccupationalHealth/MedicineInventory/TransactionTable")
-);
-
-//Maternity Register
-const MaternityRegisterTable = React.lazy(
-  () =>
-    import("./views/OccupationalHealth/MedicalReports/MaternityRegisterTable")
-);
-
-//External Audit And Inspection
-const ExternalAuditTable = React.lazy(
-  () => import("./views/AuditAndInspection/ExternalAudit/AuditTable")
-);
-
-//Sustainability
-const SustainabilityTable = React.lazy(
-  () => import("./views/Sustainability/SustainabilityTable")
-);
-
-//Environment
-const TargetSettingsTable = React.lazy(
-  () => import("./views/Environment/TargetSettings/TargetSettingsTable")
-);
-
-const EnvironmentTable = React.lazy(
-  () => import("./views/Environment/Consumption/ConsumptionTable")
-);
-const AuditAndInspectionDashboard = React.lazy(
-  () => import("./views/AuditAndInspection/Dashboard")
-);
 
 const Autocomplete = React.lazy(
   () => import("./views/Components/Autocomplete")
@@ -239,9 +158,6 @@ const DatePickers = React.lazy(
 );
 const OtherInputs = React.lazy(
   () => import("./views/Components/OtherInputs")
-);
-const EnvironmentDashBoard = React.lazy(
-  () => import("./views/Environment/Dashboard")
 );
 
 const AccordianAndDividers = React.lazy(
@@ -312,36 +228,37 @@ const AppRoutes = () => {
           path="/dashboard"
           element={withLayout(MainLayout, Dashboard)}
         />
+      </Route>
 
-        {/* Administration */}
-        <Route
-          path="/admin/organization-settings"
-          element={withLayout(
-            MainLayout,
-            OrganizationTable,
-            !userPermissionObject?.[PermissionKeys.ADMIN_USERS_VIEW]
-          )}
-        />
+      {/* Administration */}
+      <Route
+        path="/admin/organization-settings"
+        element={withLayout(
+          MainLayout,
+          OrganizationTable,
+          !userPermissionObject?.[PermissionKeys.ADMIN_USERS_VIEW]
+        )}
+      />
 
-        <Route
-          path="/admin/users"
-          element={withLayout(
-            MainLayout,
-            UserTable,
-            !userPermissionObject?.[PermissionKeys.ADMIN_USERS_VIEW]
-          )}
-        />
-        <Route
-          path="/admin/access-management"
-          element={withLayout(
-            MainLayout,
-            AccessManagementTable,
-            !userPermissionObject?.[PermissionKeys.ADMIN_ACCESS_MNG_VIEW]
-          )}
-        />
+      <Route
+        path="/admin/users"
+        element={withLayout(
+          MainLayout,
+          UserTable,
+          !userPermissionObject?.[PermissionKeys.ADMIN_USERS_VIEW]
+        )}
+      />
+      <Route
+        path="/admin/access-management"
+        element={withLayout(
+          MainLayout,
+          AccessManagementTable,
+          !userPermissionObject?.[PermissionKeys.ADMIN_ACCESS_MNG_VIEW]
+        )}
+      />
 
-        {/* Audit & Inspection */}
-        {/* <Route
+      {/* Audit & Inspection */}
+      {/* <Route
           path="/input-fields/autocomplete"
           element={withLayout(
             MainLayout,
@@ -397,11 +314,11 @@ const AppRoutes = () => {
             MainLayout,
             AuditCalendar */}
             // !userPermissionObject?.[
-            //   PermissionKeys.AUDIT_INSPECTION_CALENDAR_VIEW
-            // ]
-          {/* )}
+      //   PermissionKeys.AUDIT_INSPECTION_CALENDAR_VIEW
+      // ]
+      {/* )}
         /> */}
-        {/* <Route
+      {/* <Route
           path="/audit-inspection/internal-audit/form-builder"
           element={withLayout(
             MainLayout,
@@ -429,299 +346,48 @@ const AppRoutes = () => {
               <UnderDevelopment pageName="Audit & Inspection > External Audit" />
             ) */}
             // !userPermissionObject?.[
-            //   PermissionKeys.AUDIT_INSPECTION_EXTERNAL_AUDIT_QUEUE_VIEW
-            // ]
-          {/* )}
+      //   PermissionKeys.AUDIT_INSPECTION_EXTERNAL_AUDIT_QUEUE_VIEW
+      // ]
+      {/* )}
         /> */}
 
-        {/* sustainability apps */}
-        
+      {/* sustainability apps */}
 
-        {/* document */}
-        <Route
-          path="/document"
-          element={withLayout(
-            MainLayout,
-            DocumentRegister,
-            !userPermissionObject?.[PermissionKeys.DOCUMENT_REGISTER_VIEW]
-          )}
-        />
-        {/* hazard and risk */}
-        <Route
-          path="/hazard-risk/dashboard"
-          element={withLayout(
-            MainLayout,
-            HazardRiskDashboard,
-            !userPermissionObject?.[PermissionKeys.HAZARD_RISK_DASHBOARD_VIEW]
-          )}
-        />
-        <Route
-          path="/hazard-risk/history"
-          element={withLayout(
-            MainLayout,
-            () => (
-              <HazardRiskTable isAssignedTasks={false} />
-            ),
-            !userPermissionObject?.[PermissionKeys.HAZARD_RISK_REGISTER_VIEW]
-          )}
-        />
-        <Route
-          path="/hazard-risk/assigned-tasks"
-          element={withLayout(
-            MainLayout,
-            () => (
-              <HazardRiskTable isAssignedTasks={true} />
-            ),
-            !userPermissionObject?.[
-            PermissionKeys.HAZARD_RISK_ASSIGNED_TASKS_VIEW
-            ]
-          )}
-        />
-        {/* Occupational health */}
-        {/* Dashboard */}
-        <Route
-          path="/occupational-health/dashboard"
-          element={withLayout(
-            MainLayout,
-            OccupationalHealthDashboard,
-            !userPermissionObject?.[
-            PermissionKeys.OCCUPATIONAL_HEALTH_DASHBOARD_VIEW
-            ]
-          )}
-        />
-        {/* Clinical Suite */}
-        <Route
-          path="/occupational-health/clinical-suite/patient-register"
-          element={withLayout(
-            MainLayout,
-            PatientTable,
-            !userPermissionObject?.[
-            PermissionKeys
-              .OCCUPATIONAL_HEALTH_CLINICAL_SUITE_PATIENT_REGISTER_VIEW
-            ]
-          )}
-        />
-        <Route
-          path="/occupational-health/clinical-suite/consultation"
-          element={withLayout(
-            MainLayout,
-            () => (
-              <UnderDevelopment pageName="Clinical Suite > Consultation" />
-            )
-            // !userPermissionObject?.[
-            //   PermissionKeys
-            //     .OCCUPATIONAL_HEALTH_CLINICAL_SUITE_CONSULTATION_VIEW
-            // ]
-          )}
-        />
-        <Route
-          path="/occupational-health/clinical-suite/medicine-stock"
-          element={withLayout(
-            MainLayout,
-            MedicineStockTable,
-            !userPermissionObject?.[
-            PermissionKeys
-              .OCCUPATIONAL_HEALTH_CLINICAL_SUITE_MEDICINE_STOCK_VIEW
-            ]
-          )}
-        />
-        <Route
-          path="/occupational-health/clinical-suite/pharmacy-queue"
-          element={withLayout(
-            MainLayout,
-            () => (
-              <UnderDevelopment pageName="Clinical Suite > Pharmacy Queue" />
-            )
-            // !userPermissionObject?.[
-            //   PermissionKeys
-            //     .OCCUPATIONAL_HEALTH_CLINICAL_SUITE_PHARMACY_QUEUE_VIEW
-            // ]
-          )}
-        />
-        {/* Medicine Inventory */}
-        <Route
-          path="/occupational-health/medicines-inventory/medicine-request"
-          element={withLayout(
-            MainLayout,
-            () => (
-              <MedicineRequestTable isAssignedTasks={false} />
-            ),
-            !userPermissionObject?.[
-            PermissionKeys
-              .OCCUPATIONAL_HEALTH_MEDICINE_INVENTORY_MEDICINE_REQUEST_VIEW
-            ]
-          )}
-        />
-        <Route
-          path="/occupational-health/medicines-inventory/purchase-inventory"
-          element={withLayout(
-            MainLayout,
-            PurchaseAndInventoryTable,
-            !userPermissionObject?.[
-            PermissionKeys
-              .OCCUPATIONAL_HEALTH_MEDICINE_INVENTORY_PURCHASE_INVENTORY_VIEW
-            ]
-          )}
-        />
-        <Route
-          path="/occupational-health/medicines-inventory/transaction"
-          element={withLayout(
-            MainLayout,
-            PurchaseAndInventoryTransactionTable,
-            !userPermissionObject?.[
-            PermissionKeys
-              .OCCUPATIONAL_HEALTH_MEDICINE_INVENTORY_TRANSACTION_VIEW
-            ]
-          )}
-        />
-        <Route
-          path="/occupational-health/medicines-inventory/assigned-tasks"
-          element={withLayout(
-            MainLayout,
-            () => (
-              <MedicineRequestTable isAssignedTasks={true} />
-            ),
-            !userPermissionObject?.[
-            PermissionKeys
-              .OCCUPATIONAL_HEALTH_MEDICINE_INVENTORY_ASSIGNED_TASKS_VIEW
-            ]
-          )}
-        />
-        {/* Medical Records */}
-        <Route
-          path="/occupational-health/medical-records/maternity-register"
-          element={withLayout(
-            MainLayout,
-            MaternityRegisterTable,
-            !userPermissionObject?.[
-            PermissionKeys
-              .OCCUPATIONAL_HEALTH_MEDICAL_RECORDS_MATERNITY_REGISTER_VIEW
-            ]
-          )}
-        />
 
-        {/* External Audits */}
-        <Route
-          path="/audit-inspection/external-audit/register"
-          element={withLayout(
-            MainLayout,
-            ExternalAuditTable,
-            !userPermissionObject?.[
-            PermissionKeys.AUDIT_INSPECTION_EXTERNAL_AUDIT_REGISTER_VIEW
-            ]
-          )}
-        />
-        <Route
-          path="/sustainability/register"
-          element={withLayout(
-            MainLayout,
-            SustainabilityTable,
-            !userPermissionObject?.[
-            PermissionKeys.SUSTAINABILITY_SDG_REPORTING_CREATE
-            ]
-          )}
-        />
-        <Route
-          path="/environment/dashboard"
-          element={withLayout(
-            MainLayout,
-            EnvironmentDashBoard,
-            !userPermissionObject?.[PermissionKeys.ENVIRONMENT_DASHBOARD_VIEW]
-          )}
-        />
-        <Route
-          path="/environment/history/target-setting"
-          element={withLayout(
-            MainLayout,
-            TargetSettingsTable,
-            !userPermissionObject?.[
-            PermissionKeys.ENVIRONMENT_HISTORY_TARGET_SETTING_VIEW
-            ]
-          )}
-        />
-        <Route
-          path="/environment/assigned-tasks/target-setting"
-          element={withLayout(
-            MainLayout,
-            () => (
-              <TargetSettingsTable isAssignedTasks={true} />
-            ),
-            !userPermissionObject?.[
-            PermissionKeys.ENVIRONMENT_ASSIGNED_TASKS_TARGET_SETTING_VIEW
-            ]
-          )}
-        />
-        <Route
-          path="/environment/history/consumption"
-          element={withLayout(
-            MainLayout,
-            EnvironmentTable,
-            !userPermissionObject?.[
-            PermissionKeys.ENVIRONMENT_HISTORY_CONSUMPTION_VIEW
-            ]
-          )}
-        />
-        <Route
-          path="/environment/assigned-tasks/consumption"
-          element={withLayout(
-            MainLayout,
-            () => (
-              <EnvironmentTable isAssignedTasks={true} />
-            ),
-            !userPermissionObject?.[
-            PermissionKeys.ENVIRONMENT_ASSIGNED_TASKS_CONSUMPTION_VIEW
-            ]
-          )}
-        />
-      </Route>
+      {/* document */}
       <Route
-        path="/audit-inspection/external-audit/assigned-tasks"
+        path="/document"
+        element={withLayout(
+          MainLayout,
+          DocumentRegister,
+          !userPermissionObject?.[PermissionKeys.DOCUMENT_REGISTER_VIEW]
+        )}
+      />
+      <Route
+        path="/occupational-health/clinical-suite/consultation"
         element={withLayout(
           MainLayout,
           () => (
-            <ExternalAuditTable
-              isAssignedTasks={true}
-              isCorrectiveAction={false}
-              isAuditQueue={false}
-            />
-          ),
-          false
+            <UnderDevelopment pageName="Clinical Suite > Consultation" />
+          )
           // !userPermissionObject?.[
-          //   PermissionKeys.AUDIT_INSPECTION_EXTERNAL_AUDIT_TASK_VIEW
+          //   PermissionKeys
+          //     .OCCUPATIONAL_HEALTH_CLINICAL_SUITE_CONSULTATION_VIEW
           // ]
         )}
       />
+
       <Route
-        path="/audit-inspection/external-audit/audit-queue"
+        path="/occupational-health/clinical-suite/pharmacy-queue"
         element={withLayout(
           MainLayout,
           () => (
-            <ExternalAuditTable
-              isAssignedTasks={false}
-              isCorrectiveAction={false}
-              isAuditQueue={true}
-            />
-          ),
-          !userPermissionObject?.[
-          PermissionKeys.AUDIT_INSPECTION_EXTERNAL_AUDIT_QUEUE_VIEW
-          ]
-        )}
-      />
-      <Route
-        path="/audit-inspection/external-audit/corrective-action"
-        element={withLayout(
-          MainLayout,
-          () => (
-            <ExternalAuditTable
-              isAssignedTasks={false}
-              isCorrectiveAction={true}
-              isAuditQueue={false}
-            />
-          ),
-          !userPermissionObject?.[
-          PermissionKeys
-            .AUDIT_INSPECTION_EXTERNAL_AUDIT_CORRECTIVE_ACTION_VIEW
-          ]
+            <UnderDevelopment pageName="Clinical Suite > Pharmacy Queue" />
+          )
+          // !userPermissionObject?.[
+          //   PermissionKeys
+          //     .OCCUPATIONAL_HEALTH_CLINICAL_SUITE_PHARMACY_QUEUE_VIEW
+          // ]
         )}
       />
 

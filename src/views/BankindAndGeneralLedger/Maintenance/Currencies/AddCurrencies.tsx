@@ -13,7 +13,6 @@ import {
 } from "@mui/material";
 import theme from "../../../../theme";
 import { createCurrency } from "../../../../api/Currency/currencyApi";
-import { createCurrency } from "../../../../api/Currency/CurrencyApi";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 
@@ -75,55 +74,43 @@ export default function AddCurrencies() {
   };
 
   const handleSubmit = async () => {
-    if (validate()) {
+    if (!validate()) return;
 
-      await createCurrency({
+    try {
+      const payload = {
         currency_abbreviation: formData.currencyAbbreviation,
         currency_symbol: formData.currencySymbol,
         currency_name: formData.currencyName,
         hundredths_name: formData.hundredthsName,
         country: formData.country,
         auto_exchange_rate_update: formData.autoExchangeRateUpdate,
-      } as any);
+      };
+
+      const currency = await createCurrency(payload);
 
       alert("Currency added successfully!");
+      console.log("Created currency:", currency);
+
+      // Refresh query
+      queryClient.invalidateQueries({ queryKey: ["currencies"] });
+
+      // Reset form
+      setFormData({
+        currencyAbbreviation: "",
+        currencySymbol: "",
+        currencyName: "",
+        hundredthsName: "",
+        country: "",
+        autoExchangeRateUpdate: false,
+      });
+      setErrors({});
+
       navigate("/bankingandgeneralledger/maintenance/currencies");
-
-      try {
-        const payload = {
-          currency_abbreviation: formData.currencyAbbreviation,
-          currency_symbol: formData.currencySymbol,
-          currency_name: formData.currencyName,
-          hundredths_name: formData.hundredthsName,
-          country: formData.country,
-          auto_exchange_rate_update: formData.autoExchangeRateUpdate,
-        };
-
-        const currency = await createCurrency(payload);
-        alert("Currency added successfully!");
-        console.log("Created currency:", currency);
-
-        // Refresh currency list if you have a query
-        queryClient.invalidateQueries({ queryKey: ["currencies"] });
-        // Optional: reset form
-        setFormData({
-          currencyAbbreviation: "",
-          currencySymbol: "",
-          currencyName: "",
-          hundredthsName: "",
-          country: "",
-          autoExchangeRateUpdate: false,
-        });
-
-        navigate("/bankingandgeneralledger/maintenance/currencies");
-        
-        setErrors({});
-      } catch (err: any) {
-        alert("Error creating currency: " + JSON.stringify(err));
-      }
-
+    } catch (err: any) {
+      alert("Error creating currency: " + JSON.stringify(err));
     }
   };
+
 
   return (
     <Stack alignItems="center" sx={{ mt: 4, px: 2 }}>

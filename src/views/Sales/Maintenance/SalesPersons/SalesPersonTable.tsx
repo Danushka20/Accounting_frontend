@@ -140,7 +140,7 @@ function SalesPersonTable() {
           <Button
             variant="outlined"
             startIcon={<ArrowBackIcon />}
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/sales/maintenance")}
           >
             Back
           </Button>
