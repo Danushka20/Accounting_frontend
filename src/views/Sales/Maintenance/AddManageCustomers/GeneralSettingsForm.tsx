@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import theme from "../../../../theme";
 import { createCustomer } from "../../../../api/Customer/AddCustomerApi";
+import { useNavigate } from "react-router";
 
 export default function GeneralSettingsForm() {
   const [formData, setFormData] = useState({
@@ -42,7 +43,7 @@ export default function GeneralSettingsForm() {
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-
+  const navigate = useNavigate();
   const handleChange = (field: string, value: string) => {
     setFormData({ ...formData, [field]: value });
     if (errors[field]) {
@@ -183,6 +184,9 @@ export default function GeneralSettingsForm() {
         salesArea: "",
         taxGroup: "",
       });
+
+      navigate("/sales/maintenance/add-and-manage-customers");
+
     } catch (error: any) {
       console.error("Error creating customer:", error);
       alert("Failed to save customer. See console for details.");

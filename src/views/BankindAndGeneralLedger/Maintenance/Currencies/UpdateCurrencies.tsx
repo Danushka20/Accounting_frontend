@@ -87,6 +87,7 @@ export default function UpdateCurrencies() {
 
   const handleSubmit = async () => {
     if (validate() && id) {
+
       await updateCurrency(Number(id), {
         currency_abbreviation: formData.currencyAbbreviation,
         currency_symbol: formData.currencySymbol,
@@ -98,6 +99,28 @@ export default function UpdateCurrencies() {
 
       alert("Currency updated successfully!");
       navigate("/bankingandgeneralledger/maintenance/currencies");
+
+      try {
+        const payload = {
+          currency_abbreviation: formData.currencyAbbreviation,
+          currency_symbol: formData.currencySymbol,
+          currency_name: formData.currencyName,
+          hundredths_name: formData.hundredthsName,
+          country: formData.country,
+          auto_exchange_rate_update: formData.autoExchangeRateUpdate,
+        };
+
+        const updatedCurrency = await updateCurrency(id, payload);
+        alert("Currency updated successfully!");
+        console.log("Updated currency:", updatedCurrency);
+
+        queryClient.invalidateQueries({ queryKey: ["currencies"] });
+        navigate("/bankingandgeneralledger/maintenance/currencies");
+      } catch (err: any) {
+        console.error("Error updating currency:", err);
+        alert("Error updating currency: " + JSON.stringify(err));
+      }
+
     }
   };
 

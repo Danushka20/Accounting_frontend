@@ -15,6 +15,9 @@ import { getFiscalYear, updateFiscalYear } from "../../../../api/FiscalYear/Fisc
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 
+
+=======
+
 interface FiscalYearFormData {
     fiscalYearFrom: string;
     fiscalYearTo: string;
@@ -61,12 +64,23 @@ export default function UpdateFiscalYear() {
         fetchData();
     }, [id, reset]);
 
+
     const onSubmit = async (data: FiscalYearFormData) => {
         try {
             const payload = {
                 fiscal_year_from: data.fiscalYearFrom,
                 fiscal_year_to: data.fiscalYearTo,
             };
+
+
+
+    const onSubmit = async (data: FiscalYearFormData) => {
+        try {
+            const payload = {
+                fiscal_year_from: data.fiscalYearFrom,
+                fiscal_year_to: data.fiscalYearTo,
+            };
+
 
             const updated = await updateFiscalYear(id, payload);
             console.log("Fiscal Year updated:", updated);
