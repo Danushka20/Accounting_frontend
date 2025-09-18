@@ -13,8 +13,8 @@ import {
   Divider,
   FormHelperText,
 } from "@mui/material";
-import theme from "../../../../theme";
-import { createCustomer } from "../../../../api/Customer/AddCustomerApi";
+import theme from "../../../../../theme";
+import { createCustomer } from "../../../../../api/Customer/AddCustomerApi";
 import { useNavigate } from "react-router";
 
 export default function GeneralSettingsForm() {

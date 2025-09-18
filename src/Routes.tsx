@@ -74,7 +74,7 @@ import AddSalesGroupsForm from "./views/Sales/Maintenance/SalesGroups/AddSalesGr
 import UpdateSalesGroupsForm from "./views/Sales/Maintenance/SalesGroups/UpdateSalesGroupsForm";
 import SalesGroupsTable from "./views/Sales/Maintenance/SalesGroups/SalesGroupsTable";
 import Suppliers from "./views/Purchases/Maintenance/Suppliers/Suppliers";
-import GeneralSettingsForm from "./views/Sales/Maintenance/AddManageCustomers/GeneralSettingsForm";
+import GeneralSettingsForm from "./views/Sales/Maintenance/AddManageCustomers/GeneralSettingsForm/GeneralSettingsForm";
 import SupplierGeneralSettingsForm from "./views/Purchases/Maintenance/Suppliers/SupplierGeneralSettingsForm";
 import UnitsOfMeasureTable from "./views/ItemsAndInventory/Maintenance/UnitsOfMeasure/UnitsOfMeasureTable";
 import AddUnitsOfMeasureForm from "./views/ItemsAndInventory/Maintenance/UnitsOfMeasure/AddUnitsOfMeasureForm";
@@ -104,6 +104,16 @@ import GlAccountClassesTable from "./views/BankindAndGeneralLedger/Maintenance/G
 import AddGlAccountClassesForm from "./views/BankindAndGeneralLedger/Maintenance/GlAccountClasses/AddGlAccountClassesForm";
 import UpdateGlAccountClassesForm from "./views/BankindAndGeneralLedger/Maintenance/GlAccountClasses/UpdateGlAccountClassesForm";
 import AddChartofAccounts from "./views/Setup/Maintenance/ChartOfAccounts/AddChartOfAccounts";
+import ItemTaxTypesTable from "./views/Setup/CompanySetup/ItemTaxTypes/ItemTaxTypesTable";
+import AddItemTaxTypes from "./views/Setup/CompanySetup/ItemTaxTypes/AddItemTaxTypes";
+import UpdateItemTaxTypes from "./views/Setup/CompanySetup/ItemTaxTypes/UpdateItemTaxTypes";
+import SystemGLSetupForm from "./views/Setup/CompanySetup/SystemAndGeneralGlSetup/SystemGLSetupForm";
+import ContactsTable from "./views/Sales/Maintenance/AddManageCustomers/Contacts/ContactsTable";
+import AttachmentsTable from "./views/Sales/Maintenance/AddManageCustomers/Attachments/AttachmentsTable";
+import AddAttachmentsForm from "./views/Sales/Maintenance/AddManageCustomers/Attachments/AddAttachments";
+import UpdateAttachmentsForm from "./views/Sales/Maintenance/AddManageCustomers/Attachments/UpdateAttachments";
+import SalesOrdersTable from "./views/Sales/Maintenance/AddManageCustomers/SalesOrders/SalesOrdersTable";
+import TransactionsTable from "./views/Sales/Maintenance/AddManageCustomers/Transactions/TransactionsTable";
 
 const LoginPage = React.lazy(() => import("./views/LoginPage/LoginPage"));
 const RegistrationPage = React.lazy(
@@ -417,19 +427,27 @@ const AppRoutes = () => {
       />
       <Route
         path="/sales/maintenance/add-and-manage-customers/contacts"
-        element={withLayout(MainLayout, AddManageCutomers)}
+        element={withLayout(MainLayout, ContactsTable)}
       />
       <Route
         path="/sales/maintenance/add-and-manage-customers/transactions"
-        element={withLayout(MainLayout, AddManageCutomers)}
+        element={withLayout(MainLayout, TransactionsTable)}
       />
       <Route
         path="/sales/maintenance/add-and-manage-customers/sales-orders"
-        element={withLayout(MainLayout, AddManageCutomers)}
+        element={withLayout(MainLayout, SalesOrdersTable)}
       />
       <Route
         path="/sales/maintenance/add-and-manage-customers/attachments"
-        element={withLayout(MainLayout, AddManageCutomers)}
+        element={withLayout(MainLayout, AttachmentsTable)}
+      />
+      <Route
+        path="/sales/maintenance/add-and-manage-customers/add-attachments"
+        element={withLayout(MainLayout, AddAttachmentsForm)}
+      />
+      <Route
+        path="/sales/maintenance/add-and-manage-customers/update-attachments"
+        element={withLayout(MainLayout, UpdateAttachmentsForm)}
       />
       <Route
         path="/sales/maintenance/sales-groups"
@@ -775,7 +793,22 @@ const AppRoutes = () => {
         path="/setup/companysetup/update-tax-types"
         element={withLayout(MainLayout, UpdateTaxTypes)}
       />
-
+      <Route
+        path="/setup/companysetup/item-tax-types"
+        element={withLayout(MainLayout, ItemTaxTypesTable)}
+      />
+      <Route
+        path="/setup/companysetup/add-item-tax-types"
+        element={withLayout(MainLayout, AddItemTaxTypes)}
+      />
+      <Route
+        path="/setup/companysetup/update-item-tax-types"
+        element={withLayout(MainLayout, UpdateItemTaxTypes)}
+      />
+      <Route
+        path="/setup/companysetup/system-and-general-gl-setup"
+        element={withLayout(MainLayout, SystemGLSetupForm)}
+      />
 
       <Route
         path="/setup/miscellaneous"
