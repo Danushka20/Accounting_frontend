@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Stack,
@@ -16,6 +16,8 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import theme from "../../../../theme";
+import { updateTaxType, getTaxType } from "../../../../api/Tax/taxServices";
+import { useParams } from "react-router";
 
 interface TaxFormData {
   description: string;
@@ -25,6 +27,7 @@ interface TaxFormData {
 }
 
 export default function UpdateTaxTypes() {
+  const { id } = useParams<{ id: string }>();
   const [formData, setFormData] = useState<TaxFormData>({
     description: "",
     defaultRate: "",
@@ -70,10 +73,37 @@ export default function UpdateTaxTypes() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
-    if (validate()) {
-      console.log("Submitted Tax Group:", formData);
-      alert("Form updated successfully!");
+  useEffect(() => {
+    if (id) {
+      getTaxType(id).then((data) => {
+        setFormData({
+          description: data.description || "",
+          defaultRate: data.default_rate?.toString() || "",
+          salesGlAccount: data.sales_gl_account || "",
+          purchasingGlAccount: data.purchasing_gl_account || "",
+        });
+      });
+    }
+  }, [id]);
+
+
+  const handleSubmit = async () => {
+    if (validate() && id) {
+      try {
+        const payload = {
+          description: formData.description,
+          default_rate: formData.defaultRate,
+          sales_gl_account: formData.salesGlAccount,
+          purchasing_gl_account: formData.purchasingGlAccount,
+        };
+
+        await updateTaxType(id, payload);
+        alert("Tax type updated successfully!");
+        window.history.back();
+      } catch (error) {
+        console.error(error);
+        alert("Failed to update tax type");
+      }
     }
   };
 
@@ -124,9 +154,9 @@ export default function UpdateTaxTypes() {
               onChange={handleSelectChange}
               label="Sales GL Account"
             >
-              <MenuItem value="4000">4000 - Sales Revenue</MenuItem>
-              <MenuItem value="4010">4010 - Services Revenue</MenuItem>
-              <MenuItem value="4020">4020 - Other Income</MenuItem>
+              <MenuItem value="4000 - Sales Revenue">4000 - Sales Revenue</MenuItem>
+              <MenuItem value="4010 - Services Revenue">4010 - Services Revenue</MenuItem>
+              <MenuItem value="4020 - Other Income">4020 - Other Income</MenuItem>
             </Select>
             <FormHelperText>{errors.salesGlAccount}</FormHelperText>
           </FormControl>
@@ -139,9 +169,9 @@ export default function UpdateTaxTypes() {
               onChange={handleSelectChange}
               label="Purchasing GL Account"
             >
-              <MenuItem value="5000">5000 - Purchase Expenses</MenuItem>
-              <MenuItem value="5010">5010 - Freight Expenses</MenuItem>
-              <MenuItem value="5020">5020 - Other Costs</MenuItem>
+              <MenuItem value="5000 - Purchase Expenses">5000 - Purchase Expenses</MenuItem>
+              <MenuItem value="5010 - Freight Expenses">5010 - Freight Expenses</MenuItem>
+              <MenuItem value="5020 - Other Costs">5020 - Other Costs</MenuItem>
             </Select>
             <FormHelperText>{errors.purchasingGlAccount}</FormHelperText>
           </FormControl>

@@ -12,7 +12,7 @@ import {
   useTheme,
 } from "@mui/material";
 import theme from "../../../../theme";
-import { createCurrency } from "../../../../api/Currency/currencyApi";
+import { createCurrency } from "../../../../api/Currency/CurrencyApi";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 

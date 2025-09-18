@@ -12,6 +12,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import theme from "../../../../theme";
+import { createTaxGroup } from "../../../../api/Tax/taxServices";
 
 interface TaxGroupFormData {
   description: string;
@@ -56,12 +57,23 @@ export default function AddTaxGroupsForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
-    if (validate()) {
-      console.log("Submitted Tax Group:", formData);
-      alert("Form submitted successfully!");
+  const handleSubmit = async () => {
+  if (validate()) {
+    try {
+      const payload = {
+        description: formData.description,
+        tax: formData.tax,
+        shipping_tax: Number(formData.shippingTax),
+      };
+      await createTaxGroup(payload);
+      alert("Tax Group created successfully!");
+      window.history.back();
+    } catch (error) {
+      console.error("Error creating tax group:", error);
+      alert("Failed to create Tax Group. Please try again.");
     }
-  };
+  }
+};
 
   return (
     <Stack alignItems="center" sx={{ mt: 4, px: 2 }}>

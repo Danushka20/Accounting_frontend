@@ -760,7 +760,7 @@ const AppRoutes = () => {
         element={withLayout(MainLayout, AddTaxGroupsForm)}
       />
       <Route
-        path="/setup/companysetup/update-tax-groups"
+        path="/setup/companysetup/update-tax-groups/:id"
         element={withLayout(MainLayout, UpdateTaxGroupsForm)}
       />
       <Route
@@ -772,7 +772,7 @@ const AppRoutes = () => {
         element={withLayout(MainLayout, AddTaxTypes)}
       />
       <Route
-        path="/setup/companysetup/update-tax-types"
+        path="/setup/companysetup/update-tax-types/:id"
         element={withLayout(MainLayout, UpdateTaxTypes)}
       />
 

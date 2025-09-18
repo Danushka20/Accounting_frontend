@@ -26,58 +26,59 @@ import Breadcrumb from "../../../../components/BreadCrumb";
 import PageTitle from "../../../../components/PageTitle";
 import theme from "../../../../theme";
 import SearchBar from "../../../../components/SearchBar";
+import { getTaxGroups, deleteTaxGroup } from "../../../../api/Tax/taxServices";
 
 // Mock API function
-const getTaxGroups = async () => [
-  {
-    id: 1,
-    description: "Standard Tax",
-    taxExempt: "No",
-    inactive: false,
-  },
-  {
-    id: 2,
-    description: "Reduced Tax",
-    taxExempt: "Yes",
-    inactive: true,
-  },
-  {
-    id: 3,
-    description: "Standard Tax",
-    taxExempt: "No",
-    inactive: false,
-  },
-  {
-    id: 4,
-    description: "Reduced Tax",
-    taxExempt: "Yes",
-    inactive: true,
-  },
-  {
-    id: 5,
-    description: "Standard Tax",
-    taxExempt: "No",
-    inactive: false,
-  },
-  {
-    id: 6,
-    description: "Reduced Tax",
-    taxExempt: "Yes",
-    inactive: true,
-  },
-  {
-    id: 7,
-    description: "Standard Tax",
-    taxExempt: "No",
-    inactive: false,
-  },
-  {
-    id: 8,
-    description: "Reduced Tax",
-    taxExempt: "Yes",
-    inactive: true,
-  },
-];
+// const getTaxGroups = async () => [
+//   {
+//     id: 1,
+//     description: "Standard Tax",
+//     taxExempt: "No",
+//     inactive: false,
+//   },
+//   {
+//     id: 2,
+//     description: "Reduced Tax",
+//     taxExempt: "Yes",
+//     inactive: true,
+//   },
+//   {
+//     id: 3,
+//     description: "Standard Tax",
+//     taxExempt: "No",
+//     inactive: false,
+//   },
+//   {
+//     id: 4,
+//     description: "Reduced Tax",
+//     taxExempt: "Yes",
+//     inactive: true,
+//   },
+//   {
+//     id: 5,
+//     description: "Standard Tax",
+//     taxExempt: "No",
+//     inactive: false,
+//   },
+//   {
+//     id: 6,
+//     description: "Reduced Tax",
+//     taxExempt: "Yes",
+//     inactive: true,
+//   },
+//   {
+//     id: 7,
+//     description: "Standard Tax",
+//     taxExempt: "No",
+//     inactive: false,
+//   },
+//   {
+//     id: 8,
+//     description: "Reduced Tax",
+//     taxExempt: "Yes",
+//     inactive: true,
+//   },
+// ];
 
 export default function TaxGroupTable() {
   const [page, setPage] = useState(0);
@@ -95,14 +96,13 @@ export default function TaxGroupTable() {
 
   // Filter data based on global checkbox & search query
   const filteredData = useMemo(() => {
-    let data = showInactive ? taxGroups : taxGroups.filter((g) => !g.inactive);
+    let data = showInactive ? taxGroups : taxGroups.filter((g) => !g.inactive && g.tax);
 
     if (searchQuery.trim() !== "") {
       const lower = searchQuery.toLowerCase();
       data = data.filter(
         (g) =>
-          g.description.toLowerCase().includes(lower) ||
-          g.taxExempt.toLowerCase().includes(lower)
+          g.description.toLowerCase().includes(lower)
       );
     }
 
@@ -126,8 +126,15 @@ export default function TaxGroupTable() {
     setPage(0);
   };
 
-  const handleDelete = (id: number) => {
-    alert(`Delete tax group with id: ${id}`);
+  const handleDelete = async (id: number) => {
+    if (window.confirm("Are you sure you want to delete this Tax Group?")) {
+      try {
+        await deleteTaxGroup(id);
+        setTaxGroups((prev) => prev.filter((g) => g.id !== id));
+      } catch (error) {
+        console.error("Error deleting tax group:", error);
+      }
+    }
   };
 
   const breadcrumbItems = [
@@ -208,7 +215,7 @@ export default function TaxGroupTable() {
             <TableHead sx={{ backgroundColor: "var(--pallet-lighter-blue)" }}>
               <TableRow>
                 <TableCell>Description</TableCell>
-                <TableCell>Tax Exempt</TableCell>
+                <TableCell align="center">Tax Exempt</TableCell>
                 <TableCell align="center">Actions</TableCell>
               </TableRow>
             </TableHead>
@@ -217,14 +224,16 @@ export default function TaxGroupTable() {
                 paginatedData.map((group) => (
                   <TableRow key={group.id} hover>
                     <TableCell>{group.description}</TableCell>
-                    <TableCell>{group.taxExempt}</TableCell>
+                    <TableCell align="center">
+                      <Checkbox checked={group.tax} disabled />
+                    </TableCell>
                     <TableCell align="center">
                       <Stack direction="row" spacing={1} justifyContent="center">
                         <Button
                           variant="contained"
                           size="small"
                           startIcon={<EditIcon />}
-                          onClick={() => navigate("/setup/companysetup/update-tax-groups")}
+                          onClick={() => navigate(`/setup/companysetup/update-tax-groups/${group.id}`)}
                         >
                           Edit
                         </Button>

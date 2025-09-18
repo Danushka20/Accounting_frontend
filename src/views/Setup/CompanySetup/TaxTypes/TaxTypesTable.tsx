@@ -17,7 +17,7 @@ import {
   Checkbox,
   FormControlLabel,
 } from "@mui/material";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -26,90 +26,91 @@ import Breadcrumb from "../../../../components/BreadCrumb";
 import PageTitle from "../../../../components/PageTitle";
 import theme from "../../../../theme";
 import SearchBar from "../../../../components/SearchBar";
+import { getTaxTypes, deleteTaxType } from "../../../../api/Tax/taxServices";
 
 // Mock API function
-const getTaxGroups = async () => [
-  {
-    id: 1,
-    description: "Standard Tax",
-    defaultRate: 15,
-    salesGlAccount: "4000 - Sales Revenue",
-    purchasingGlAccount: "5000 - Purchase Expenses",
-    inactive: false,
-  },
-  {
-    id: 2,
-    description: "Reduced Tax",
-    defaultRate: 8,
-    salesGlAccount: "4010 - Services Revenue",
-    purchasingGlAccount: "5010 - Freight Expenses",
-    inactive: true,
-  },
-  {
-    id: 3,
-    description: "Standard Tax",
-    defaultRate: 15,
-    salesGlAccount: "4020 - Sales Revenue",
-    purchasingGlAccount: "5020 - Purchase Expenses",
-    inactive: false,
-  },
-  {
-    id: 4,
-    description: "Reduced Tax",
-    defaultRate: 8,
-    salesGlAccount: "4030 - Services Revenue",
-    purchasingGlAccount: "5030 - Freight Expenses",
-    inactive: true,
-  },
-  {
-    id: 5,
-    description: "Standard Tax",
-    defaultRate: 15,
-    salesGlAccount: "4040 - Sales Revenue",
-    purchasingGlAccount: "5040 - Purchase Expenses",
-    inactive: false,
-  },
-  {
-    id: 6,
-    description: "Reduced Tax",
-    defaultRate: 8,
-    salesGlAccount: "4010 - Services Revenue",
-    purchasingGlAccount: "5010 - Freight Expenses",
-    inactive: true,
-  },
-  {
-    id: 7,
-    description: "Standard Tax",
-    defaultRate: 15,
-    salesGlAccount: "4000 - Sales Revenue",
-    purchasingGlAccount: "5000 - Purchase Expenses",
-    inactive: false,
-  },
-  {
-    id: 8,
-    description: "Reduced Tax",
-    defaultRate: 8,
-    salesGlAccount: "4010 - Services Revenue",
-    purchasingGlAccount: "5010 - Freight Expenses",
-    inactive: true,
-  },
-  {
-    id: 9,
-    description: "Standard Tax",
-    defaultRate: 15,
-    salesGlAccount: "4000 - Sales Revenue",
-    purchasingGlAccount: "5000 - Purchase Expenses",
-    inactive: false,
-  },
-  {
-    id: 10,
-    description: "Reduced Tax",
-    defaultRate: 8,
-    salesGlAccount: "4010 - Services Revenue",
-    purchasingGlAccount: "5010 - Freight Expenses",
-    inactive: true,
-  },
-];
+// const getTaxGroups = async () => [
+//   {
+//     id: 1,
+//     description: "Standard Tax",
+//     defaultRate: 15,
+//     salesGlAccount: "4000 - Sales Revenue",
+//     purchasingGlAccount: "5000 - Purchase Expenses",
+//     inactive: false,
+//   },
+//   {
+//     id: 2,
+//     description: "Reduced Tax",
+//     defaultRate: 8,
+//     salesGlAccount: "4010 - Services Revenue",
+//     purchasingGlAccount: "5010 - Freight Expenses",
+//     inactive: true,
+//   },
+//   {
+//     id: 3,
+//     description: "Standard Tax",
+//     defaultRate: 15,
+//     salesGlAccount: "4020 - Sales Revenue",
+//     purchasingGlAccount: "5020 - Purchase Expenses",
+//     inactive: false,
+//   },
+//   {
+//     id: 4,
+//     description: "Reduced Tax",
+//     defaultRate: 8,
+//     salesGlAccount: "4030 - Services Revenue",
+//     purchasingGlAccount: "5030 - Freight Expenses",
+//     inactive: true,
+//   },
+//   {
+//     id: 5,
+//     description: "Standard Tax",
+//     defaultRate: 15,
+//     salesGlAccount: "4040 - Sales Revenue",
+//     purchasingGlAccount: "5040 - Purchase Expenses",
+//     inactive: false,
+//   },
+//   {
+//     id: 6,
+//     description: "Reduced Tax",
+//     defaultRate: 8,
+//     salesGlAccount: "4010 - Services Revenue",
+//     purchasingGlAccount: "5010 - Freight Expenses",
+//     inactive: true,
+//   },
+//   {
+//     id: 7,
+//     description: "Standard Tax",
+//     defaultRate: 15,
+//     salesGlAccount: "4000 - Sales Revenue",
+//     purchasingGlAccount: "5000 - Purchase Expenses",
+//     inactive: false,
+//   },
+//   {
+//     id: 8,
+//     description: "Reduced Tax",
+//     defaultRate: 8,
+//     salesGlAccount: "4010 - Services Revenue",
+//     purchasingGlAccount: "5010 - Freight Expenses",
+//     inactive: true,
+//   },
+//   {
+//     id: 9,
+//     description: "Standard Tax",
+//     defaultRate: 15,
+//     salesGlAccount: "4000 - Sales Revenue",
+//     purchasingGlAccount: "5000 - Purchase Expenses",
+//     inactive: false,
+//   },
+//   {
+//     id: 10,
+//     description: "Reduced Tax",
+//     defaultRate: 8,
+//     salesGlAccount: "4010 - Services Revenue",
+//     purchasingGlAccount: "5010 - Freight Expenses",
+//     inactive: true,
+//   },
+// ];
 
 export default function TaxGroupTable() {
   const [page, setPage] = useState(0);
@@ -121,9 +122,13 @@ export default function TaxGroupTable() {
   const navigate = useNavigate();
 
   // Fetch data (simulate API)
-  useState(() => {
-    getTaxGroups().then((data) => setTaxGroups(data));
-  });
+  // useState(() => {
+  //   getTaxGroups().then((data) => setTaxGroups(data));
+  // });
+
+  useEffect(() => {
+    getTaxTypes().then((data) => setTaxGroups(data));
+  }, []);
 
   // Filter rows based on global checkbox and search query
   const filteredData = useMemo(() => {
@@ -134,8 +139,8 @@ export default function TaxGroupTable() {
       data = data.filter(
         (g) =>
           g.description.toLowerCase().includes(lower) ||
-          g.salesGlAccount.toLowerCase().includes(lower) ||
-          g.purchasingGlAccount.toLowerCase().includes(lower)
+          g.sales_gl_account.toLowerCase().includes(lower) ||
+          g.purchasing_gl_account.toLowerCase().includes(lower)
       );
     }
 
@@ -159,8 +164,11 @@ export default function TaxGroupTable() {
     setPage(0);
   };
 
-  const handleDelete = (id: number) => {
-    alert(`Delete tax group with id: ${id}`);
+  const handleDelete = async (id: number) => {
+    if (window.confirm("Are you sure you want to delete this tax type?")) {
+      await deleteTaxType(id);
+      setTaxGroups((prev) => prev.filter((g) => g.id !== id));
+    }
   };
 
   const breadcrumbItems = [
@@ -252,16 +260,16 @@ export default function TaxGroupTable() {
                 paginatedData.map((group) => (
                   <TableRow key={group.id} hover>
                     <TableCell>{group.description}</TableCell>
-                    <TableCell>{group.defaultRate}</TableCell>
-                    <TableCell>{group.salesGlAccount}</TableCell>
-                    <TableCell>{group.purchasingGlAccount}</TableCell>
+                    <TableCell>{group.default_rate}</TableCell>
+                    <TableCell>{group.sales_gl_account}</TableCell>
+                    <TableCell>{group.purchasing_gl_account}</TableCell>
                     <TableCell align="center">
                       <Stack direction="row" spacing={1} justifyContent="center">
                         <Button
                           variant="contained"
                           size="small"
                           startIcon={<EditIcon />}
-                          onClick={() => navigate("/setup/companysetup/update-tax-types")}
+                          onClick={() => navigate(`/setup/companysetup/update-tax-types/${group.id}`)}
                         >
                           Edit
                         </Button>

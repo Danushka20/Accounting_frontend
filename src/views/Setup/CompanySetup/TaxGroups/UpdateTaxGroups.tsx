@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Stack,
@@ -12,6 +12,8 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import theme from "../../../../theme";
+import { getTaxGroup, updateTaxGroup } from "../../../../api/Tax/taxServices";
+import { useParams } from "react-router";
 
 interface TaxGroupFormData {
   description: string;
@@ -22,6 +24,7 @@ interface TaxGroupFormData {
 export default function UpdateTaxGroupsForm() {
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
+  const { id } = useParams<{ id: string }>();
 
   const [formData, setFormData] = useState<TaxGroupFormData>({
     description: "",
@@ -56,10 +59,33 @@ export default function UpdateTaxGroupsForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
-    if (validate()) {
-      console.log("Submitted Tax Group:", formData);
-      alert("Form submitted successfully!");
+  useEffect(() => {
+    if (id) {
+      getTaxGroup(id).then((data) => {
+        setFormData({
+          description: data.description,
+          tax: data.tax,
+          shippingTax: String(data.shipping_tax),
+        });
+      });
+    }
+  }, [id]);
+
+  const handleSubmit = async () => {
+    if (validate() && id) {
+      try {
+        const payload = {
+          description: formData.description,
+          tax: formData.tax,
+          shipping_tax: Number(formData.shippingTax),
+        };
+        await updateTaxGroup(id, payload);
+        alert("Tax Group updated successfully!");
+        window.history.back();
+      } catch (error) {
+        console.error("Error updating tax group:", error);
+        alert("Failed to update Tax Group. Please try again.");
+      }
     }
   };
 

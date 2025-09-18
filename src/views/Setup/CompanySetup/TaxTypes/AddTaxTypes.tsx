@@ -16,6 +16,7 @@ import {
   useTheme,
 } from "@mui/material";
 import theme from "../../../../theme";
+import { createTaxType } from "../../../../api/Tax/taxServices";
 
 interface TaxFormData {
   description: string;
@@ -70,10 +71,23 @@ export default function AddTaxTypes() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validate()) {
-      console.log("Submitted Tax Group:", formData);
-      alert("Form submitted successfully!");
+      try {
+        const payload = {
+          description: formData.description,
+          default_rate: formData.defaultRate,
+          sales_gl_account: formData.salesGlAccount,
+          purchasing_gl_account: formData.purchasingGlAccount,
+        };
+
+        await createTaxType(payload);
+        alert("Tax type created successfully!");
+        window.history.back();
+      } catch (error) {
+        console.error(error);
+        alert("Failed to create tax type");
+      }
     }
   };
 
@@ -124,9 +138,9 @@ export default function AddTaxTypes() {
               onChange={handleSelectChange}
               label="Sales GL Account"
             >
-              <MenuItem value="4000">4000 - Sales Revenue</MenuItem>
-              <MenuItem value="4010">4010 - Services Revenue</MenuItem>
-              <MenuItem value="4020">4020 - Other Income</MenuItem>
+              <MenuItem value="4000 - Sales Revenue">4000 - Sales Revenue</MenuItem>
+              <MenuItem value="4010 - Services Revenue">4010 - Services Revenue</MenuItem>
+              <MenuItem value="4020 - Other Income">4020 - Other Income</MenuItem>
             </Select>
             <FormHelperText>{errors.salesGlAccount}</FormHelperText>
           </FormControl>
@@ -139,9 +153,9 @@ export default function AddTaxTypes() {
               onChange={handleSelectChange}
               label="Purchasing GL Account"
             >
-              <MenuItem value="5000">5000 - Purchase Expenses</MenuItem>
-              <MenuItem value="5010">5010 - Freight Expenses</MenuItem>
-              <MenuItem value="5020">5020 - Other Costs</MenuItem>
+              <MenuItem value="5000 - Purchase Expenses">5000 - Purchase Expenses</MenuItem>
+              <MenuItem value="5010 - Freight Expenses">5010 - Freight Expenses</MenuItem>
+              <MenuItem value="5020 - Other Costs">5020 - Other Costs</MenuItem>
             </Select>
             <FormHelperText>{errors.purchasingGlAccount}</FormHelperText>
           </FormControl>
