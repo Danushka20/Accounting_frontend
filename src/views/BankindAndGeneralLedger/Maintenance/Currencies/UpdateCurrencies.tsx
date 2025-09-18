@@ -12,6 +12,7 @@ import {
   useTheme,
 } from "@mui/material";
 import theme from "../../../../theme";
+import { useQueryClient } from "@tanstack/react-query";
 import { getCurrency, updateCurrency } from "../../../../api/Currency/currencyApi";
 import { useParams, useNavigate } from "react-router-dom";
 
@@ -27,6 +28,7 @@ interface CurrenciesFormData {
 export default function UpdateCurrencies() {
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
+  const queryClient = useQueryClient();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
@@ -86,43 +88,31 @@ export default function UpdateCurrencies() {
   };
 
   const handleSubmit = async () => {
-    if (validate() && id) {
+    if (!validate() || !id) return;
 
-      await updateCurrency(Number(id), {
+    try {
+      const payload = {
         currency_abbreviation: formData.currencyAbbreviation,
         currency_symbol: formData.currencySymbol,
         currency_name: formData.currencyName,
         hundredths_name: formData.hundredthsName,
         country: formData.country,
         auto_exchange_rate_update: formData.autoExchangeRateUpdate,
-      } as any);
+      };
+
+      const updatedCurrency = await updateCurrency(Number(id), payload);
 
       alert("Currency updated successfully!");
+      console.log("Updated currency:", updatedCurrency);
+
+      queryClient.invalidateQueries({ queryKey: ["currencies"] });
       navigate("/bankingandgeneralledger/maintenance/currencies");
-
-      try {
-        const payload = {
-          currency_abbreviation: formData.currencyAbbreviation,
-          currency_symbol: formData.currencySymbol,
-          currency_name: formData.currencyName,
-          hundredths_name: formData.hundredthsName,
-          country: formData.country,
-          auto_exchange_rate_update: formData.autoExchangeRateUpdate,
-        };
-
-        const updatedCurrency = await updateCurrency(id, payload);
-        alert("Currency updated successfully!");
-        console.log("Updated currency:", updatedCurrency);
-
-        queryClient.invalidateQueries({ queryKey: ["currencies"] });
-        navigate("/bankingandgeneralledger/maintenance/currencies");
-      } catch (err: any) {
-        console.error("Error updating currency:", err);
-        alert("Error updating currency: " + JSON.stringify(err));
-      }
-
+    } catch (err: any) {
+      console.error("Error updating currency:", err);
+      alert("Error updating currency: " + JSON.stringify(err));
     }
   };
+
 
   return (
     <Stack alignItems="center" sx={{ mt: 4, px: 2 }}>
