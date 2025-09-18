@@ -86,12 +86,6 @@ function CompanySetup() {
       icon: <NoteAddIcon sx={{ fontSize: 40, color: "#1976d2" }} />,
       path: "/setup/companysetup/fiscal-years",
     },
-    {
-      text: "PRINT PROFILES",
-      change: +36,
-      icon: <NoteAddIcon sx={{ fontSize: 40, color: "#1976d2" }} />,
-      path: "/setup/companysetup/print-profiles",
-    },
   ];
 
   const handleItemClick = (path, text) => {
