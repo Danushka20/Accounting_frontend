@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import theme from "../../../../theme";
 import { useQueryClient } from "@tanstack/react-query";
-import { getCurrency, updateCurrency } from "../../../../api/Currency/currencyApi";
+import { getCurrency, updateCurrency } from "../../../../api/Currency/CurrencyApi";
 import { useParams, useNavigate } from "react-router-dom";
 
 interface CurrenciesFormData {

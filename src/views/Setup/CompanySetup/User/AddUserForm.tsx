@@ -30,6 +30,7 @@ interface UserFormData {
   address: string;
   email: string;
   password: string;
+  confirmPassword: string;
   role: string;
   status: string;
 }
@@ -45,6 +46,7 @@ export default function AddUserForm() {
     address: "",
     email: "",
     password: "",
+    confirmPassword: "",
     role: "",
     status: "",
   });
@@ -90,6 +92,11 @@ export default function AddUserForm() {
     } else if (formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
     }
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = "Please confirm your password";
+    } else if (formData.confirmPassword !== formData.password) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
     if (!formData.role) newErrors.role = "Role is required";
     if (!formData.status) newErrors.status = "Status is required";
 
@@ -121,20 +128,6 @@ export default function AddUserForm() {
         alert("User created successfully!");
         queryClient.invalidateQueries({ queryKey: ["users"] });
         queryClient.refetchQueries({ queryKey: ["users"] });
-        // Optional: reset form
-        // setFormData({
-        //   id: "",
-        //   firstName: "",
-        //   lastName: "",
-        //   department: "",
-        //   epf: "",
-        //   telephone: "",
-        //   address: "",
-        //   email: "",
-        //   password: "",
-        //   role: "",
-        //   status: "",
-        // });
         navigate("/setup/companysetup/user-account-setup");
         setErrors({});
       } catch (err: any) {
@@ -258,6 +251,18 @@ export default function AddUserForm() {
             onChange={handleInputChange}
             error={!!errors.password}
             helperText={errors.password}
+          />
+
+          <TextField
+            label="Confirm Password"
+            name="confirmPassword"
+            type="password"
+            size="small"
+            fullWidth
+            value={formData.confirmPassword}
+            onChange={handleInputChange}
+            error={!!errors.confirmPassword}
+            helperText={errors.confirmPassword}
           />
 
           <FormControl size="small" fullWidth error={!!errors.role}>

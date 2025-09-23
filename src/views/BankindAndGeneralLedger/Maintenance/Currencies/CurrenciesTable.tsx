@@ -17,7 +17,7 @@ import theme from "../../../../theme";
 import Breadcrumb from "../../../../components/BreadCrumb";
 import PageTitle from "../../../../components/PageTitle";
 import SearchBar from "../../../../components/SearchBar";
-import { getCurrencies, deleteCurrency } from "../../../../api/Currency/currencyApi";
+import { getCurrencies, deleteCurrency } from "../../../../api/Currency/CurrencyApi";
 
 // Mock API function for currency data
 // const getCurrencies = async () => [

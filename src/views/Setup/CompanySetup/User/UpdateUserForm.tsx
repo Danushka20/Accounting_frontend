@@ -30,6 +30,7 @@ interface UserFormData {
   address: string;
   email: string;
   password: string;
+  confirmPassword: string;
   role: string;
   status: string;
 }
@@ -46,6 +47,7 @@ export default function UpdateUserForm() {
     address: "",
     email: "",
     password: "",
+    confirmPassword: "",
     role: "",
     status: "",
   });
@@ -77,6 +79,7 @@ export default function UpdateUserForm() {
           address: user.address || "",
           email: user.email,
           password: "",
+          confirmPassword: "",
           role: "",
           status: "",
         });
@@ -112,6 +115,11 @@ export default function UpdateUserForm() {
       newErrors.password = "Password is required";
     } else if (formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
+    }
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = "Confirm Password is required";
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
     }
     if (!formData.role) newErrors.role = "Role is required";
     if (!formData.status) newErrors.status = "Status is required";
@@ -269,6 +277,18 @@ export default function UpdateUserForm() {
             onChange={handleInputChange}
             error={!!errors.password}
             helperText={errors.password}
+          />
+
+          <TextField
+            label="Confirm Password"
+            name="confirmPassword"
+            type="password"
+            size="small"
+            fullWidth
+            value={formData.confirmPassword}
+            onChange={handleInputChange}
+            error={!!errors.confirmPassword}
+            helperText={errors.confirmPassword}
           />
 
           <FormControl size="small" fullWidth error={!!errors.role}>
