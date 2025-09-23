@@ -15,7 +15,7 @@ import {
   FormControlLabel,
   Grid,
 } from "@mui/material";
-import theme from "../../../../theme";
+import theme from "../../../../../theme";
 
 export default function ItemsGeneralSettingsForm() {
   const [formData, setFormData] = useState({

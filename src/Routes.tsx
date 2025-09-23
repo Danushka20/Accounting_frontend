@@ -80,7 +80,7 @@ import UnitsOfMeasureTable from "./views/ItemsAndInventory/Maintenance/UnitsOfMe
 import AddUnitsOfMeasureForm from "./views/ItemsAndInventory/Maintenance/UnitsOfMeasure/AddUnitsOfMeasureForm";
 import UpdateUnitsOfMeasureForm from "./views/ItemsAndInventory/Maintenance/UnitsOfMeasure/UpdateUnitsOfMeasureForm";
 import Items from "./views/ItemsAndInventory/Maintenance/Items/Items";
-import ItemsGeneralSettingsForm from "./views/ItemsAndInventory/Maintenance/Items/ItemsGeneralSettingsForm";
+import ItemsGeneralSettingsForm from "./views/ItemsAndInventory/Maintenance/Items/ItemsGeneralSettings/ItemsGeneralSettingsForm";
 import InventoryLocationTable from "./views/ItemsAndInventory/Maintenance/InventoryLocations/InventoryLocationTable";
 import AddInventoryLocationForm from "./views/ItemsAndInventory/Maintenance/InventoryLocations/AddInventoryLocationsForm";
 import UpdateInventoryLocationForm from "./views/ItemsAndInventory/Maintenance/InventoryLocations/UpdateInventoryLocationsForm";
@@ -114,6 +114,22 @@ import AddAttachmentsForm from "./views/Sales/Maintenance/AddManageCustomers/Att
 import UpdateAttachmentsForm from "./views/Sales/Maintenance/AddManageCustomers/Attachments/UpdateAttachments";
 import SalesOrdersTable from "./views/Sales/Maintenance/AddManageCustomers/SalesOrders/SalesOrdersTable";
 import TransactionsTable from "./views/Sales/Maintenance/AddManageCustomers/Transactions/TransactionsTable";
+import AccountTagsTable from "./views/BankindAndGeneralLedger/Maintenance/AccountTags/AccountTagsTable";
+import AddAccountTagsForm from "./views/BankindAndGeneralLedger/Maintenance/AccountTags/AddAccountTagsForm";
+import UpdateAccountTagsForm from "./views/BankindAndGeneralLedger/Maintenance/AccountTags/UpdateAccountTagsForm";
+import AddExchangeRateForm from "./views/BankindAndGeneralLedger/Maintenance/ExchangeRates/AddExchangeRateForm";
+import UpdateExchangeRateForm from "./views/BankindAndGeneralLedger/Maintenance/ExchangeRates/UpdateExchangeRateForm";
+import ExchangeRateTable from "./views/BankindAndGeneralLedger/Maintenance/ExchangeRates/ExchangeRateTable";
+import AddGlAccount from "./views/BankindAndGeneralLedger/Maintenance/GlAccounts/AddGlAccount";
+import AddSalesPricingForm from "./views/ItemsAndInventory/Maintenance/Items/SalesPricing/AddSalesPricingForm";
+import UpdateSalesPricingForm from "./views/ItemsAndInventory/Maintenance/Items/SalesPricing/UpdateSalesPricingForm";
+import SalesPricingTable from "./views/ItemsAndInventory/Maintenance/Items/SalesPricing/SalesPricingTable";
+import PurchasingPricingTable from "./views/ItemsAndInventory/Maintenance/Items/PurchasingPricing/PurchasingPricingTable";
+import AddPurchasingPricingForm from "./views/ItemsAndInventory/Maintenance/Items/PurchasingPricing/AddPurchasingPricingForm";
+import UpdatePurchasePricingForm from "./views/ItemsAndInventory/Maintenance/Items/PurchasingPricing/UpdatePurchasingPricingForm";
+import AddStandardCostForm from "./views/ItemsAndInventory/Maintenance/Items/StandardCosts/AddStandardCostForm";
+import StatusTable from "./views/ItemsAndInventory/Maintenance/Items/Status/StatusTable";
+
 
 const LoginPage = React.lazy(() => import("./views/LoginPage/LoginPage"));
 const RegistrationPage = React.lazy(
@@ -563,7 +579,38 @@ const AppRoutes = () => {
         path="/itemsandinventory/maintenance/items/general-settings"
         element={withLayout(MainLayout, ItemsGeneralSettingsForm)}
       />
-
+      <Route
+        path="/itemsandinventory/maintenance/items/sales-pricing"
+        element={withLayout(MainLayout, SalesPricingTable)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/items/add-sales-pricing"
+        element={withLayout(MainLayout, AddSalesPricingForm)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/items/update-sales-pricing"
+        element={withLayout(MainLayout, UpdateSalesPricingForm)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/items/purchasing-pricing"
+        element={withLayout(MainLayout, PurchasingPricingTable)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/items/add-purchasing-pricing"
+        element={withLayout(MainLayout, AddPurchasingPricingForm)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/items/update-purchasing-pricing"
+        element={withLayout(MainLayout, UpdatePurchasePricingForm)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/items/standard-costs"
+        element={withLayout(MainLayout, AddStandardCostForm)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/items/status"
+        element={withLayout(MainLayout, StatusTable)}
+      />
       <Route
         path="/itemsandinventory/maintenance/update-units-of-measure"
         element={withLayout(MainLayout, UpdateUnitsOfMeasureForm)}
@@ -676,6 +723,34 @@ const AppRoutes = () => {
         element={withLayout(MainLayout, UpdateBankAccountsForm)}
       />
       <Route
+        path="/bankingandgeneralledger/maintenance/account-tags"
+        element={withLayout(MainLayout, AccountTagsTable)}
+      />
+      <Route
+        path="/bankingandgeneralledger/maintenance/add-account-tags"
+        element={withLayout(MainLayout, AddAccountTagsForm)}
+      />
+      <Route
+        path="/bankingandgeneralledger/maintenance/exchange-rates"
+        element={withLayout(MainLayout, ExchangeRateTable)}
+      />
+      <Route
+        path="/bankingandgeneralledger/maintenance/add-exchange-rate"
+        element={withLayout(MainLayout, AddExchangeRateForm)}
+      />
+      <Route
+        path="/bankingandgeneralledger/maintenance/update-exchange-rate"
+        element={withLayout(MainLayout, UpdateExchangeRateForm)}
+      />
+      <Route
+        path="/bankingandgeneralledger/maintenance/gl-accounts"
+        element={withLayout(MainLayout, AddGlAccount)}
+      />
+      <Route
+        path="/bankingandgeneralledger/maintenance/update-account-tags/:id"
+        element={withLayout(MainLayout, UpdateAccountTagsForm)}
+      />
+      <Route
         path="/bankingandgeneralledger/maintenance/currencies"
         element={withLayout(MainLayout, CurrenciesTable)}
       />
@@ -699,6 +774,7 @@ const AppRoutes = () => {
         path="/bankingandgeneralledger/maintenance/update-quick-entry"
         element={withLayout(MainLayout, UpdateQuickEntriesForm)}
       />
+      
       <Route
         path="/bankingandgeneralledger/maintenance/gl-account-groups"
         element={withLayout(MainLayout, GlAccountGroupsTable)}
