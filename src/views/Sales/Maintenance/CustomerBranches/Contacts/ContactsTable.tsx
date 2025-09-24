@@ -133,7 +133,7 @@ export default function ContactsTable() {
           <Button
             variant="contained"
             color="primary"
-            onClick={() => navigate("/sales/maintenance/add-and-manage-customers/general-settings")}
+            onClick={() => navigate("/sales/maintenance/customer-branches/add-customer-branches-contacts")}
           >
             Add Contact
           </Button>
@@ -141,7 +141,7 @@ export default function ContactsTable() {
           <Button
             variant="outlined"
             startIcon={<ArrowBackIcon />}
-            onClick={() => navigate("/sales/maintenance/add-and-manage-customers")}
+            onClick={() => navigate("/sales/maintenance/customer-branches/")}
           >
             Back
           </Button>
@@ -203,7 +203,7 @@ export default function ContactsTable() {
                           size="small"
                           startIcon={<EditIcon />}
                           onClick={() => navigate(
-                            "/sales/maintenance/add-and-manage-customers/general-settings"
+                            "/sales/maintenance/customer-branches/update-customer-branches-contacts"
                             // `/sales/maintenancne/update-contact/${contact.id}`
                           )}
                         >

@@ -18,20 +18,24 @@ import {
 import { useNavigate } from "react-router-dom";
 import theme from "../../../../../theme";
 
-interface PurchasePricingFormData {
-  currency: string;
-  purchaseType: string;
+interface PurchasingPricingFormData {
+  supplier: string;
   price: string;
+  supplierUOM: string;
+  conversionFactor: string;
+  supplierCode: string;
 }
 
 export default function AddPurchasingPricingForm() {
-  const [formData, setFormData] = useState<PurchasePricingFormData>({
-    currency: "",
-    purchaseType: "",
+  const [formData, setFormData] = useState<PurchasingPricingFormData>({
+    supplier: "",
     price: "",
+    supplierUOM: "",
+    conversionFactor: "",
+    supplierCode: "",
   });
 
-  const [errors, setErrors] = useState<Partial<PurchasePricingFormData>>({});
+  const [errors, setErrors] = useState<Partial<PurchasingPricingFormData>>({});
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
   const navigate = useNavigate();
@@ -49,10 +53,12 @@ export default function AddPurchasingPricingForm() {
   };
 
   const validate = () => {
-    const newErrors: Partial<PurchasePricingFormData> = {};
-    if (!formData.currency) newErrors.currency = "Currency is required";
-    if (!formData.purchaseType) newErrors.purchaseType = "Purchase Type is required";
+    const newErrors: Partial<PurchasingPricingFormData> = {};
+    if (!formData.supplier) newErrors.supplier = "Supplier is required";
     if (!formData.price) newErrors.price = "Price is required";
+    if (!formData.supplierUOM) newErrors.supplierUOM = "Supplier UOM is required";
+    if (!formData.conversionFactor) newErrors.conversionFactor = "Conversion factor is required";
+    if (!formData.supplierCode) newErrors.supplierCode = "Supplier code/description is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -60,12 +66,14 @@ export default function AddPurchasingPricingForm() {
 
   const handleSubmit = () => {
     if (validate()) {
-      console.log("Purchase Pricing Submitted:", formData);
-      alert("Purchase Pricing added successfully!");
+      console.log("Purchasing Pricing Submitted:", formData);
+      alert("Purchasing Pricing added successfully!");
       setFormData({
-        currency: "",
-        purchaseType: "",
+        supplier: "",
         price: "",
+        supplierUOM: "",
+        conversionFactor: "",
+        supplierCode: "",
       });
     }
   };
@@ -82,41 +90,29 @@ export default function AddPurchasingPricingForm() {
         }}
       >
         <Typography variant="h6" sx={{ mb: 3, textAlign: isMobile ? "center" : "left" }}>
-          Add Purchase Pricing
+          Add Purchasing Pricing
         </Typography>
 
         <Stack spacing={2}>
-          <FormControl size="small" fullWidth error={!!errors.currency}>
-            <InputLabel>Currency</InputLabel>
+          {/* Supplier Dropdown */}
+          <FormControl size="small" fullWidth error={!!errors.supplier}>
+            <InputLabel>Supplier</InputLabel>
             <Select
-              name="currency"
-              value={formData.currency}
+              name="supplier"
+              value={formData.supplier}
               onChange={handleSelectChange}
-              label="Currency"
+              label="Supplier"
             >
-              <MenuItem value="USD">USD</MenuItem>
-              <MenuItem value="EUR">EUR</MenuItem>
-              <MenuItem value="LKR">LKR</MenuItem>
+              <MenuItem value="ABC Traders">ABC Traders</MenuItem>
+              <MenuItem value="XYZ Supplies">XYZ Supplies</MenuItem>
+              <MenuItem value="Global Imports">Global Imports</MenuItem>
             </Select>
-            <FormHelperText>{errors.currency}</FormHelperText>
+            <FormHelperText>{errors.supplier}</FormHelperText>
           </FormControl>
 
-          <FormControl size="small" fullWidth error={!!errors.purchaseType}>
-            <InputLabel>Purchase Type</InputLabel>
-            <Select
-              name="purchaseType"
-              value={formData.purchaseType}
-              onChange={handleSelectChange}
-              label="Purchase Type"
-            >
-              <MenuItem value="retail">Retail</MenuItem>
-              <MenuItem value="wholesale">Wholesale</MenuItem>
-            </Select>
-            <FormHelperText>{errors.purchaseType}</FormHelperText>
-          </FormControl>
-
+          {/* Price */}
           <TextField
-            label="Price (per each)"
+            label="Price"
             name="price"
             size="small"
             fullWidth
@@ -125,6 +121,43 @@ export default function AddPurchasingPricingForm() {
             onChange={handleInputChange}
             error={!!errors.price}
             helperText={errors.price}
+          />
+
+          {/* Supplier UOM */}
+          <TextField
+            label="Supplier Units of Measure"
+            name="supplierUOM"
+            size="small"
+            fullWidth
+            value={formData.supplierUOM}
+            onChange={handleInputChange}
+            error={!!errors.supplierUOM}
+            helperText={errors.supplierUOM}
+          />
+
+          {/* Conversion Factor */}
+          <TextField
+            label="Conversion Factor (to our UOM)"
+            name="conversionFactor"
+            size="small"
+            fullWidth
+            type="number"
+            value={formData.conversionFactor}
+            onChange={handleInputChange}
+            error={!!errors.conversionFactor}
+            helperText={errors.conversionFactor}
+          />
+
+          {/* Supplier Code / Description */}
+          <TextField
+            label="Supplier's Code or Description"
+            name="supplierCode"
+            size="small"
+            fullWidth
+            value={formData.supplierCode}
+            onChange={handleInputChange}
+            error={!!errors.supplierCode}
+            helperText={errors.supplierCode}
           />
         </Stack>
 

@@ -137,7 +137,10 @@ export default function UpdateSalesPricingForm() {
             gap: isMobile ? 2 : 0,
           }}
         >
-          <Button onClick={() => navigate("itemsandinventory/maintenance/items/sales-pricing")}>Back</Button>
+          <Button
+            onClick={() => navigate("/itemsandinventory/maintenance/items/sales-pricing")}>
+            Back
+          </Button>
 
           <Button
             variant="contained"
