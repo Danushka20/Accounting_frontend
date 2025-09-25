@@ -77,7 +77,7 @@ function SetupMaintenance() {
     {
       text: "SOFTWARE UPDATE",
       icon: <CreditScoreIcon sx={{ fontSize: 40, color: "#1976d2" }} />,
-      change: +24, path: "/setup/maintenance/software-update"
+      change: +24, path: "/setup/maintenance/software-upgrade"
     },
   ];
 

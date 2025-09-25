@@ -174,6 +174,11 @@ import UpdateDimensionTagsForm from "./views/Dimensions/Maintenance/DimensionTag
 import LanguagesTable from "./views/Setup/Maintenance/InstallUpdateLanguages/LanguagesTable";
 import AddLanguagesForm from "./views/Setup/Maintenance/InstallUpdateLanguages/AddLanguagesForm";
 import UpdateLanguagesForm from "./views/Setup/Maintenance/InstallUpdateLanguages/UpdateLanguagesForm";
+import InstallExtensions from "./views/Setup/Maintenance/InstallActivateExtensions/InstallExtensions";
+import InstallThemes from "./views/Setup/Maintenance/InstallActivateThemes/InstallThemes";
+import SoftwareUpdateTable from "./views/Setup/Maintenance/SoftwareUpgrade/SoftwareUpgrade";
+import InstallChartOfAccounts from "./views/Setup/Maintenance/InstallChartOfAccounts/InstallChartOfAccounts";
+import SystemDiagnostics from "./views/Setup/Maintenance/SystemDiagnostic/SystemDiagnostics";
 
 
 const LoginPage = React.lazy(() => import("./views/LoginPage/LoginPage"));
@@ -1069,7 +1074,7 @@ const AppRoutes = () => {
       />
       <Route
         path="/setup/maintenance/install-chart-of-accounts"
-        element={withLayout(MainLayout, AddChartofAccounts)}
+        element={withLayout(MainLayout, InstallChartOfAccounts)}
       />
       <Route
         path="/setup/maintenance/void-a-transaction"
@@ -1122,6 +1127,22 @@ const AppRoutes = () => {
       <Route
         path="/setup/maintenance/update-language"
         element={withLayout(MainLayout, UpdateLanguagesForm)}
+      />
+      <Route
+        path="/setup/maintenance/install-extensions"
+        element={withLayout(MainLayout, InstallExtensions)}
+      />
+      <Route
+        path="/setup/maintenance/install-themes"
+        element={withLayout(MainLayout, InstallThemes)}
+      />
+      <Route
+        path="/setup/maintenance/software-upgrade"
+        element={withLayout(MainLayout, SoftwareUpdateTable)}
+      />
+      <Route
+        path="/setup/maintenance/system-diagnostics"
+        element={withLayout(MainLayout, SystemDiagnostics)}
       />
 
 
