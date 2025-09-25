@@ -155,6 +155,25 @@ import AddSalesKitsForm from "./views/ItemsAndInventory/Maintenance/SalesKits/Ad
 import UpdateCustomersContactsForm from "./views/Sales/Maintenance/AddManageCustomers/Contacts/UpdateCustomersContactsForm";
 import AddCustomersContactsForm from "./views/Sales/Maintenance/AddManageCustomers/Contacts/AddCustomersContactsForm";
 import ContactsTable from "./views/Sales/Maintenance/CustomerBranches/Contacts/ContactsTable";
+import VoidTransactionTable from "./views/Setup/Maintenance/VoidTransaction/VoidTransactionTable";
+import VoidTransaction from "./views/Setup/Maintenance/VoidTransaction/VoidTransaction";
+import ViewPrintTransactions from "./views/Setup/Maintenance/ViewPrintTransactions/ViewPrintTransactions";
+import DocumentsTable from "./views/Setup/Maintenance/AttachDocuments/DocumentsTable";
+import AddDocumentsForm from "./views/Setup/Maintenance/AttachDocuments/AddDocumentsForm";
+import UpdateDocumentsForm from "./views/Setup/Maintenance/AttachDocuments/UpdateDocumentsForm";
+import BackupRestore from "./views/Setup/Maintenance/BackupAndRestore/BackupRestore";
+import CompanyTable from "./views/Setup/Maintenance/CreateUpdateCompany/CompanyTable";
+import AddCompanyForm from "./views/Setup/Maintenance/CreateUpdateCompany/AddCompanyForm";
+import UpdateCompanyForm from "./views/Setup/Maintenance/CreateUpdateCompany/UpdateCompanyForm";
+import FixedAssetsLocationsTable from "./views/FixedAssets/Maintenance/FixedAssets/FixedAssetsLocationsTable";
+import AddFixedAssetsLocations from "./views/FixedAssets/Maintenance/FixedAssets/AddFixedAssetsLocationsForm";
+import UpdateFixedAssetsLocations from "./views/FixedAssets/Maintenance/FixedAssets/UpdateFixedAssetsLocationsForm";
+import DimensionTagsTable from "./views/Dimensions/Maintenance/DimensionTags/DimensionTagsTable";
+import AddDimensionTagsForm from "./views/Dimensions/Maintenance/DimensionTags/AddDimensionTagsForm";
+import UpdateDimensionTagsForm from "./views/Dimensions/Maintenance/DimensionTags/UpdateDimensionTagsForm";
+import LanguagesTable from "./views/Setup/Maintenance/InstallUpdateLanguages/LanguagesTable";
+import AddLanguagesForm from "./views/Setup/Maintenance/InstallUpdateLanguages/AddLanguagesForm";
+import UpdateLanguagesForm from "./views/Setup/Maintenance/InstallUpdateLanguages/UpdateLanguagesForm";
 
 
 const LoginPage = React.lazy(() => import("./views/LoginPage/LoginPage"));
@@ -814,6 +833,18 @@ const AppRoutes = () => {
         path="/fixedassets/maintenance"
         element={withLayout(MainLayout, FixedAssestsMaintenance)}
       />
+      <Route
+        path="/fixedassets/maintenance/fixed-asset-locations"
+        element={withLayout(MainLayout, FixedAssetsLocationsTable)}
+      />
+      <Route
+        path="/fixedassets/maintenance/add-fixed-asset-location"
+        element={withLayout(MainLayout, AddFixedAssetsLocations)}
+      />
+      <Route
+        path="/fixedassets/maintenance/update-fixed-asset-location"
+        element={withLayout(MainLayout, UpdateFixedAssetsLocations)}
+      />
 
       <Route
         path="/dimension/transactions"
@@ -826,6 +857,18 @@ const AppRoutes = () => {
       <Route
         path="/dimension/maintenance"
         element={withLayout(MainLayout, DimensionMaintenance)}
+      />
+      <Route
+        path="/dimension/maintenance/dimension-tags"
+        element={withLayout(MainLayout, DimensionTagsTable)}
+      />
+      <Route
+        path="/dimension/maintenance/add-dimension-tags"
+        element={withLayout(MainLayout, AddDimensionTagsForm)}
+      />
+      <Route
+        path="/dimension/maintenance/update-dimension-tags"
+        element={withLayout(MainLayout, UpdateDimensionTagsForm)}
       />
 
       <Route
@@ -1028,6 +1071,59 @@ const AppRoutes = () => {
         path="/setup/maintenance/install-chart-of-accounts"
         element={withLayout(MainLayout, AddChartofAccounts)}
       />
+      <Route
+        path="/setup/maintenance/void-a-transaction"
+        element={withLayout(MainLayout, VoidTransactionTable)}
+      />
+      <Route
+        path="/setup/maintenance/add-void-a-transaction"
+        element={withLayout(MainLayout, VoidTransaction)}
+      />
+      <Route
+        path="/setup/maintenance/view-or-print-transaction"
+        element={withLayout(MainLayout, ViewPrintTransactions)}
+      />
+      <Route
+        path="/setup/maintenance/attach-documents"
+        element={withLayout(MainLayout, DocumentsTable)}
+      />
+      <Route
+        path="/setup/maintenance/add-document"
+        element={withLayout(MainLayout, AddDocumentsForm)}
+      />
+      <Route
+        path="/setup/maintenance/update-document"
+        element={withLayout(MainLayout, UpdateDocumentsForm)}
+      />
+      <Route
+        path="/setup/maintenance/backup-and-restore"
+        element={withLayout(MainLayout, BackupRestore)}
+      />
+      <Route
+        path="/setup/maintenance/create-update-companies"
+        element={withLayout(MainLayout, CompanyTable)}
+      />
+      <Route
+        path="/setup/maintenance/add-company"
+        element={withLayout(MainLayout, AddCompanyForm)}
+      />
+      <Route
+        path="/setup/maintenance/update-company"
+        element={withLayout(MainLayout, UpdateCompanyForm)}
+      />
+      <Route
+        path="/setup/maintenance/install-languages"
+        element={withLayout(MainLayout, LanguagesTable)}
+      />
+      <Route
+        path="/setup/maintenance/add-language"
+        element={withLayout(MainLayout, AddLanguagesForm)}
+      />
+      <Route
+        path="/setup/maintenance/update-language"
+        element={withLayout(MainLayout, UpdateLanguagesForm)}
+      />
+
 
       <Route
         path="/dashboard"

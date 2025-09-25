@@ -27,7 +27,7 @@ function DimensionMaintenance() {
       text: "DIMENSION TAGS",
       icon: <PersonAddIcon sx={{ fontSize: 40, color: "#1976d2" }} />,
       change: +24,
-      path: "/dimensions/maintenance/dimension-tags",
+      path: "/dimension/maintenance/dimension-tags",
     },
   ];
 
