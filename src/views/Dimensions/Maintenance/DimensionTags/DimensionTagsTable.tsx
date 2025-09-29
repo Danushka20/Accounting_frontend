@@ -24,12 +24,7 @@ import Breadcrumb from "../../../../components/BreadCrumb";
 import PageTitle from "../../../../components/PageTitle";
 import theme from "../../../../theme";
 import SearchBar from "../../../../components/SearchBar";
-
-// Mock API
-const getTags = async () => [
-  { id: 1, tagName: "Size", tagDescription: "Product size tag" },
-  { id: 2, tagName: "Color", tagDescription: "Product color tag" },
-];
+import { getTags, deleteTag } from "../../../../api/DimensionTag/DimensionTagApi";
 
 export default function DimensionTagsTable() {
   const [tags, setTags] = useState<any[]>([]);
@@ -39,8 +34,17 @@ export default function DimensionTagsTable() {
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
   const navigate = useNavigate();
 
+  const loadTags = async () => {
+    try {
+      const data = await getTags();
+      setTags(data);
+    } catch (error) {
+      console.error("Error fetching tags:", error);
+    }
+  };
+
   useEffect(() => {
-    getTags().then((data) => setTags(data));
+    loadTags();
   }, []);
 
   const filteredData = useMemo(() => {
@@ -67,8 +71,15 @@ export default function DimensionTagsTable() {
     setPage(0);
   };
 
-  const handleDelete = (id: number) => {
-    alert(`Delete tag with id: ${id}`);
+  const handleDelete = async (id: number) => {
+    if (window.confirm("Are you sure you want to delete this tag?")) {
+      try {
+        await deleteTag(id);
+        loadTags();
+      } catch (error) {
+        console.error("Error deleting tag:", error);
+      }
+    }
   };
 
   const breadcrumbItems = [

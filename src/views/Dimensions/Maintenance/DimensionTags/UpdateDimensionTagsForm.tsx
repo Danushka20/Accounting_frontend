@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Stack,
@@ -9,6 +9,8 @@ import {
   useTheme,
   useMediaQuery,
 } from "@mui/material";
+import { useParams, useNavigate } from "react-router-dom";
+import { getTag, updateTag } from "../../../../api/DimensionTag/DimensionTagApi";
 
 interface DimensionTagData {
   tagName: string;
@@ -16,15 +18,24 @@ interface DimensionTagData {
 }
 
 export default function UpdateDimensionTagsForm() {
+  const { id } = useParams<{ id: string }>();
   const [formData, setFormData] = useState<DimensionTagData>({
     tagName: "",
     tagDescription: "",
   });
-
   const [errors, setErrors] = useState<Partial<Record<keyof DimensionTagData, string>>>({});
+  const navigate = useNavigate();
 
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
+
+  useEffect(() => {
+    if (id) {
+      getTag(id)
+        .then((data) => setFormData({ tagName: data.tagName, tagDescription: data.tagDescription }))
+        .catch((error) => console.error("Error fetching tag:", error));
+    }
+  }, [id]);
 
   const handleChange = (field: keyof DimensionTagData, value: string) => {
     setFormData({ ...formData, [field]: value });
@@ -33,18 +44,21 @@ export default function UpdateDimensionTagsForm() {
 
   const validate = () => {
     const newErrors: Partial<Record<keyof DimensionTagData, string>> = {};
-
     if (!formData.tagName.trim()) newErrors.tagName = "Tag Name is required";
     if (!formData.tagDescription.trim()) newErrors.tagDescription = "Tag Description is required";
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
-    if (validate()) {
-      console.log("Submitted Dimension Tag:", formData);
-      alert("Dimension Tag updated successfully!");
+  const handleSubmit = async () => {
+    if (validate() && id) {
+      try {
+        await updateTag(id, formData);
+        alert("Dimension Tag updated successfully!");
+        navigate("/dimension/maintenance/dimension-tags");
+      } catch (error) {
+        console.error("Error updating tag:", error);
+      }
     }
   };
 
