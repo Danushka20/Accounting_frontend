@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, Stack, Typography } from "@mui/material";
+import { Box, Button, Grid, Stack, Typography } from "@mui/material";
 import DashboardCard from "../../../../components/DashboardCard";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ContactsIcon from "@mui/icons-material/Person";
@@ -7,6 +7,7 @@ import ReceiptIcon from "@mui/icons-material/Receipt";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import { useNavigate } from "react-router";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 const Items = () => {
   const navigate = useNavigate();
@@ -34,20 +35,29 @@ const Items = () => {
         p: { xs: 2, sm: 3, md: 5 }, // responsive padding
       }}
     >
-      <Typography
-        variant="h5"
-        sx={{ mb: 3, textAlign: "center", fontWeight: "bold" }}
-      >
-        Manage items
-      </Typography>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Typography
+          variant="h5"
+          sx={{ mb: 3, textAlign: "center", fontWeight: "bold" }}
+        >
+          Manage items
+        </Typography>
 
+        <Button
+          variant="outlined"
+          startIcon={<ArrowBackIcon />}
+          onClick={() => navigate("/itemsandinventory/maintenance") }
+        >
+          Back
+        </Button>
+      </Box>
       <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
         {customerItems.map((item, index) => (
           <Grid
             item
-            xs={12}  
-            sm={6}   
-            md={4} 
+            xs={12}
+            sm={6}
+            md={4}
             key={index}
           >
             <DashboardCard

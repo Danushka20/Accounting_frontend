@@ -80,7 +80,7 @@ import UnitsOfMeasureTable from "./views/ItemsAndInventory/Maintenance/UnitsOfMe
 import AddUnitsOfMeasureForm from "./views/ItemsAndInventory/Maintenance/UnitsOfMeasure/AddUnitsOfMeasureForm";
 import UpdateUnitsOfMeasureForm from "./views/ItemsAndInventory/Maintenance/UnitsOfMeasure/UpdateUnitsOfMeasureForm";
 import Items from "./views/ItemsAndInventory/Maintenance/Items/Items";
-import ItemsGeneralSettingsForm from "./views/ItemsAndInventory/Maintenance/Items/ItemsGeneralSettingsForm";
+import ItemsGeneralSettingsForm from "./views/ItemsAndInventory/Maintenance/Items/ItemsGeneralSettings/ItemsGeneralSettingsForm";
 import InventoryLocationTable from "./views/ItemsAndInventory/Maintenance/InventoryLocations/InventoryLocationTable";
 import AddInventoryLocationForm from "./views/ItemsAndInventory/Maintenance/InventoryLocations/AddInventoryLocationsForm";
 import UpdateInventoryLocationForm from "./views/ItemsAndInventory/Maintenance/InventoryLocations/UpdateInventoryLocationsForm";
@@ -108,12 +108,78 @@ import ItemTaxTypesTable from "./views/Setup/CompanySetup/ItemTaxTypes/ItemTaxTy
 import AddItemTaxTypes from "./views/Setup/CompanySetup/ItemTaxTypes/AddItemTaxTypes";
 import UpdateItemTaxTypes from "./views/Setup/CompanySetup/ItemTaxTypes/UpdateItemTaxTypes";
 import SystemGLSetupForm from "./views/Setup/CompanySetup/SystemAndGeneralGlSetup/SystemGLSetupForm";
-import ContactsTable from "./views/Sales/Maintenance/AddManageCustomers/Contacts/ContactsTable";
+import CustomersContactsTable from "./views/Sales/Maintenance/AddManageCustomers/Contacts/CustomersContactsTable";
 import AttachmentsTable from "./views/Sales/Maintenance/AddManageCustomers/Attachments/AttachmentsTable";
 import AddAttachmentsForm from "./views/Sales/Maintenance/AddManageCustomers/Attachments/AddAttachments";
 import UpdateAttachmentsForm from "./views/Sales/Maintenance/AddManageCustomers/Attachments/UpdateAttachments";
 import SalesOrdersTable from "./views/Sales/Maintenance/AddManageCustomers/SalesOrders/SalesOrdersTable";
 import TransactionsTable from "./views/Sales/Maintenance/AddManageCustomers/Transactions/TransactionsTable";
+import AccountTagsTable from "./views/BankindAndGeneralLedger/Maintenance/AccountTags/AccountTagsTable";
+import AddAccountTagsForm from "./views/BankindAndGeneralLedger/Maintenance/AccountTags/AddAccountTagsForm";
+import UpdateAccountTagsForm from "./views/BankindAndGeneralLedger/Maintenance/AccountTags/UpdateAccountTagsForm";
+import AddExchangeRateForm from "./views/BankindAndGeneralLedger/Maintenance/ExchangeRates/AddExchangeRateForm";
+import UpdateExchangeRateForm from "./views/BankindAndGeneralLedger/Maintenance/ExchangeRates/UpdateExchangeRateForm";
+import ExchangeRateTable from "./views/BankindAndGeneralLedger/Maintenance/ExchangeRates/ExchangeRateTable";
+import AddGlAccount from "./views/BankindAndGeneralLedger/Maintenance/GlAccounts/AddGlAccount";
+import AddSalesPricingForm from "./views/ItemsAndInventory/Maintenance/Items/SalesPricing/AddSalesPricingForm";
+import UpdateSalesPricingForm from "./views/ItemsAndInventory/Maintenance/Items/SalesPricing/UpdateSalesPricingForm";
+import SalesPricingTable from "./views/ItemsAndInventory/Maintenance/Items/SalesPricing/SalesPricingTable";
+import PurchasingPricingTable from "./views/ItemsAndInventory/Maintenance/Items/PurchasingPricing/PurchasingPricingTable";
+import AddPurchasingPricingForm from "./views/ItemsAndInventory/Maintenance/Items/PurchasingPricing/AddPurchasingPricingForm";
+import UpdatePurchasePricingForm from "./views/ItemsAndInventory/Maintenance/Items/PurchasingPricing/UpdatePurchasingPricingForm";
+import AddStandardCostForm from "./views/ItemsAndInventory/Maintenance/Items/StandardCosts/AddStandardCostForm";
+import StatusTable from "./views/ItemsAndInventory/Maintenance/Items/Status/StatusTable";
+import SuppliersContactsTable from "./views/Purchases/Maintenance/Suppliers/Contacts/SuppliersContactsTable";
+import SuppliersAttachmentsTable from "./views/Purchases/Maintenance/Suppliers/Attachments/SuppliersAttachmentsTable";
+import AddSuppliersAttachmentsForm from "./views/Purchases/Maintenance/Suppliers/Attachments/AddSuppliersAttachmentsForm";
+import UpdateSuppliersAttachmentsForm from "./views/Purchases/Maintenance/Suppliers/Attachments/UpdateSuppliersAttachmentsForm";
+import SuppliersTransactionsTable from "./views/Purchases/Maintenance/Suppliers/Transactions/SuppliersTransactionsTable";
+import SupplierPurchaseOrdersTable from "./views/Purchases/Maintenance/Suppliers/PurchaseOrders/SupplierPurchaseOrders";
+import AddSuppliersContactsForm from "./views/Purchases/Maintenance/Suppliers/Contacts/AddSuppliersContactsForm";
+import UpdateSuppliersContactsForm from "./views/Purchases/Maintenance/Suppliers/Contacts/UpdateSuppliersContactsForm";
+import CustomersBranches from "./views/Sales/Maintenance/CustomerBranches/CustomerBranches";
+import AddCustomerBranchesGeneralSettingForm from "./views/Sales/Maintenance/CustomerBranches/GeneralSettings/AddCustomerBranchesGeneralSettingForm";
+import UpdateCustomerBranchesGeneralSettingForm from "./views/Sales/Maintenance/CustomerBranches/GeneralSettings/UpdateCustomerBranchesGeneralSettingForm";
+import CustomerBranchesTable from "./views/Sales/Maintenance/CustomerBranches/GeneralSettings/CustomerBranchesTable";
+import AddContactsForm from "./views/Sales/Maintenance/CustomerBranches/Contacts/AddContactsForm";
+import UpdateContactsForm from "./views/Sales/Maintenance/CustomerBranches/Contacts/UpdateContactsForm";
+import ItemAttachmentsTable from "./views/ItemsAndInventory/Maintenance/Items/Attachments/ItemAttachmentsTable";
+import AddItemAttachmentsForm from "./views/ItemsAndInventory/Maintenance/Items/Attachments/AddItemAttachmentsForm";
+import UpdateItemAttachmentsForm from "./views/ItemsAndInventory/Maintenance/Items/Attachments/UpdateItemAttachmentsForm";
+import ReOrderLevelsForm from "./views/ItemsAndInventory/Maintenance/Items/ReOrderLevels/ReOrderLevelsForm";
+import ItemTransactionsTable from "./views/ItemsAndInventory/Maintenance/Items/Transactions/ItemTransactionsTable";
+import ForeignItemCodesTable from "./views/ItemsAndInventory/Maintenance/ForeignItemCodes/ForeignItemCodesTable";
+import AddForeignItemCodesForm from "./views/ItemsAndInventory/Maintenance/ForeignItemCodes/AddForeignItemCodesForm";
+import UpdateForeignItemCodesForm from "./views/ItemsAndInventory/Maintenance/ForeignItemCodes/UpdateForeignItemCodesForm";
+import AddSalesKitsForm from "./views/ItemsAndInventory/Maintenance/SalesKits/AddSalesKitsForm";
+import UpdateCustomersContactsForm from "./views/Sales/Maintenance/AddManageCustomers/Contacts/UpdateCustomersContactsForm";
+import AddCustomersContactsForm from "./views/Sales/Maintenance/AddManageCustomers/Contacts/AddCustomersContactsForm";
+import ContactsTable from "./views/Sales/Maintenance/CustomerBranches/Contacts/ContactsTable";
+import VoidTransactionTable from "./views/Setup/Maintenance/VoidTransaction/VoidTransactionTable";
+import VoidTransaction from "./views/Setup/Maintenance/VoidTransaction/VoidTransaction";
+import ViewPrintTransactions from "./views/Setup/Maintenance/ViewPrintTransactions/ViewPrintTransactions";
+import DocumentsTable from "./views/Setup/Maintenance/AttachDocuments/DocumentsTable";
+import AddDocumentsForm from "./views/Setup/Maintenance/AttachDocuments/AddDocumentsForm";
+import UpdateDocumentsForm from "./views/Setup/Maintenance/AttachDocuments/UpdateDocumentsForm";
+import BackupRestore from "./views/Setup/Maintenance/BackupAndRestore/BackupRestore";
+import CompanyTable from "./views/Setup/Maintenance/CreateUpdateCompany/CompanyTable";
+import AddCompanyForm from "./views/Setup/Maintenance/CreateUpdateCompany/AddCompanyForm";
+import UpdateCompanyForm from "./views/Setup/Maintenance/CreateUpdateCompany/UpdateCompanyForm";
+import FixedAssetsLocationsTable from "./views/FixedAssets/Maintenance/FixedAssets/FixedAssetsLocationsTable";
+import AddFixedAssetsLocations from "./views/FixedAssets/Maintenance/FixedAssets/AddFixedAssetsLocationsForm";
+import UpdateFixedAssetsLocations from "./views/FixedAssets/Maintenance/FixedAssets/UpdateFixedAssetsLocationsForm";
+import DimensionTagsTable from "./views/Dimensions/Maintenance/DimensionTags/DimensionTagsTable";
+import AddDimensionTagsForm from "./views/Dimensions/Maintenance/DimensionTags/AddDimensionTagsForm";
+import UpdateDimensionTagsForm from "./views/Dimensions/Maintenance/DimensionTags/UpdateDimensionTagsForm";
+import LanguagesTable from "./views/Setup/Maintenance/InstallUpdateLanguages/LanguagesTable";
+import AddLanguagesForm from "./views/Setup/Maintenance/InstallUpdateLanguages/AddLanguagesForm";
+import UpdateLanguagesForm from "./views/Setup/Maintenance/InstallUpdateLanguages/UpdateLanguagesForm";
+import InstallExtensions from "./views/Setup/Maintenance/InstallActivateExtensions/InstallExtensions";
+import InstallThemes from "./views/Setup/Maintenance/InstallActivateThemes/InstallThemes";
+import SoftwareUpdateTable from "./views/Setup/Maintenance/SoftwareUpgrade/SoftwareUpgrade";
+import InstallChartOfAccounts from "./views/Setup/Maintenance/InstallChartOfAccounts/InstallChartOfAccounts";
+import SystemDiagnostics from "./views/Setup/Maintenance/SystemDiagnostic/SystemDiagnostics";
+
 
 const LoginPage = React.lazy(() => import("./views/LoginPage/LoginPage"));
 const RegistrationPage = React.lazy(
@@ -427,7 +493,15 @@ const AppRoutes = () => {
       />
       <Route
         path="/sales/maintenance/add-and-manage-customers/contacts"
-        element={withLayout(MainLayout, ContactsTable)}
+        element={withLayout(MainLayout, CustomersContactsTable)}
+      />
+      <Route
+        path="/sales/maintenance/add-and-manage-customers/add-customers-contacts"
+        element={withLayout(MainLayout, AddCustomersContactsForm)}
+      />
+      <Route
+        path="/sales/maintenance/add-and-manage-customers/update-customers-contacts"
+        element={withLayout(MainLayout, UpdateCustomersContactsForm)}
       />
       <Route
         path="/sales/maintenance/add-and-manage-customers/transactions"
@@ -448,6 +522,34 @@ const AppRoutes = () => {
       <Route
         path="/sales/maintenance/add-and-manage-customers/update-attachments"
         element={withLayout(MainLayout, UpdateAttachmentsForm)}
+      />
+      <Route
+        path="/sales/maintenance/customer-branches"
+        element={withLayout(MainLayout, CustomersBranches)}
+      />
+      <Route
+        path="/sales/maintenance/customer-branches/general-settings"
+        element={withLayout(MainLayout, CustomerBranchesTable)}
+      />
+      <Route
+        path="/sales/maintenance/customer-branches/add-general-settings"
+        element={withLayout(MainLayout, AddCustomerBranchesGeneralSettingForm)}
+      />
+      <Route
+        path="/sales/maintenance/customer-branches/update-general-settings"
+        element={withLayout(MainLayout, UpdateCustomerBranchesGeneralSettingForm)}
+      />
+      <Route
+        path="/sales/maintenance/customer-branches/branches-contacts"
+        element={withLayout(MainLayout, ContactsTable)}
+      />
+      <Route
+        path="/sales/maintenance/customer-branches/add-customer-branches-contacts"
+        element={withLayout(MainLayout, AddContactsForm)}
+      />
+      <Route
+        path="/sales/maintenance/customer-branches/update-customer-branches-contacts"
+        element={withLayout(MainLayout, UpdateContactsForm)}
       />
       <Route
         path="/sales/maintenance/sales-groups"
@@ -530,6 +632,38 @@ const AppRoutes = () => {
         path="/purchase/maintenance/suppliers/general-settings"
         element={withLayout(MainLayout, SupplierGeneralSettingsForm)}
       />
+      <Route
+        path="/purchase/maintenance/suppliers/contacts"
+        element={withLayout(MainLayout, SuppliersContactsTable)}
+      />
+      <Route
+        path="/purchase/maintenance/suppliers/add-supplier-contact"
+        element={withLayout(MainLayout, AddSuppliersContactsForm)}
+      />
+      <Route
+        path="/purchase/maintenance/suppliers/update-supplier-contact"
+        element={withLayout(MainLayout, UpdateSuppliersContactsForm)}
+      />
+      <Route
+        path="/purchase/maintenance/suppliers/attachments"
+        element={withLayout(MainLayout, SuppliersAttachmentsTable)}
+      />
+      <Route
+        path="/purchase/maintenance/suppliers/add-attachments"
+        element={withLayout(MainLayout, AddSuppliersAttachmentsForm)}
+      />
+      <Route
+        path="/purchase/maintenance/suppliers/update-attachments"
+        element={withLayout(MainLayout, UpdateSuppliersAttachmentsForm)}
+      />
+      <Route
+        path="/purchase/maintenance/suppliers/transactions"
+        element={withLayout(MainLayout, SuppliersTransactionsTable)}
+      />
+      <Route
+        path="/purchase/maintenance/suppliers/purchases-orders"
+        element={withLayout(MainLayout, SupplierPurchaseOrdersTable)}
+      />
 
       <Route
         path="/itemsandinventory/transactions"
@@ -563,10 +697,77 @@ const AppRoutes = () => {
         path="/itemsandinventory/maintenance/items/general-settings"
         element={withLayout(MainLayout, ItemsGeneralSettingsForm)}
       />
-
+      <Route
+        path="/itemsandinventory/maintenance/items/sales-pricing"
+        element={withLayout(MainLayout, SalesPricingTable)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/items/add-sales-pricing"
+        element={withLayout(MainLayout, AddSalesPricingForm)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/items/update-sales-pricing"
+        element={withLayout(MainLayout, UpdateSalesPricingForm)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/items/purchasing-pricing"
+        element={withLayout(MainLayout, PurchasingPricingTable)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/items/add-purchasing-pricing"
+        element={withLayout(MainLayout, AddPurchasingPricingForm)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/items/update-purchasing-pricing"
+        element={withLayout(MainLayout, UpdatePurchasePricingForm)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/items/standard-costs"
+        element={withLayout(MainLayout, AddStandardCostForm)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/items/reorder-levels"
+        element={withLayout(MainLayout, ReOrderLevelsForm)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/items/transactions"
+        element={withLayout(MainLayout, ItemTransactionsTable)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/items/status"
+        element={withLayout(MainLayout, StatusTable)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/items/attachments"
+        element={withLayout(MainLayout, ItemAttachmentsTable)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/items/add-attachments"
+        element={withLayout(MainLayout, AddItemAttachmentsForm)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/items/update-attachments"
+        element={withLayout(MainLayout, UpdateItemAttachmentsForm)}
+      />
       <Route
         path="/itemsandinventory/maintenance/update-units-of-measure"
         element={withLayout(MainLayout, UpdateUnitsOfMeasureForm)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/foreign-item-codes"
+        element={withLayout(MainLayout, ForeignItemCodesTable)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/add-foreign-item-codes"
+        element={withLayout(MainLayout, AddForeignItemCodesForm)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/update-foreign-item-codes"
+        element={withLayout(MainLayout, UpdateForeignItemCodesForm)}
+      />
+      <Route
+        path="/itemsandinventory/maintenance/sales-kits"
+        element={withLayout(MainLayout, AddSalesKitsForm)}
       />
 
       <Route
@@ -637,6 +838,18 @@ const AppRoutes = () => {
         path="/fixedassets/maintenance"
         element={withLayout(MainLayout, FixedAssestsMaintenance)}
       />
+      <Route
+        path="/fixedassets/maintenance/fixed-asset-locations"
+        element={withLayout(MainLayout, FixedAssetsLocationsTable)}
+      />
+      <Route
+        path="/fixedassets/maintenance/add-fixed-asset-location"
+        element={withLayout(MainLayout, AddFixedAssetsLocations)}
+      />
+      <Route
+        path="/fixedassets/maintenance/update-fixed-asset-location"
+        element={withLayout(MainLayout, UpdateFixedAssetsLocations)}
+      />
 
       <Route
         path="/dimension/transactions"
@@ -649,6 +862,18 @@ const AppRoutes = () => {
       <Route
         path="/dimension/maintenance"
         element={withLayout(MainLayout, DimensionMaintenance)}
+      />
+      <Route
+        path="/dimension/maintenance/dimension-tags"
+        element={withLayout(MainLayout, DimensionTagsTable)}
+      />
+      <Route
+        path="/dimension/maintenance/add-dimension-tags"
+        element={withLayout(MainLayout, AddDimensionTagsForm)}
+      />
+      <Route
+        path="/dimension/maintenance/update-dimension-tags"
+        element={withLayout(MainLayout, UpdateDimensionTagsForm)}
       />
 
       <Route
@@ -676,6 +901,34 @@ const AppRoutes = () => {
         element={withLayout(MainLayout, UpdateBankAccountsForm)}
       />
       <Route
+        path="/bankingandgeneralledger/maintenance/account-tags"
+        element={withLayout(MainLayout, AccountTagsTable)}
+      />
+      <Route
+        path="/bankingandgeneralledger/maintenance/add-account-tags"
+        element={withLayout(MainLayout, AddAccountTagsForm)}
+      />
+      <Route
+        path="/bankingandgeneralledger/maintenance/exchange-rates"
+        element={withLayout(MainLayout, ExchangeRateTable)}
+      />
+      <Route
+        path="/bankingandgeneralledger/maintenance/add-exchange-rate"
+        element={withLayout(MainLayout, AddExchangeRateForm)}
+      />
+      <Route
+        path="/bankingandgeneralledger/maintenance/update-exchange-rate"
+        element={withLayout(MainLayout, UpdateExchangeRateForm)}
+      />
+      <Route
+        path="/bankingandgeneralledger/maintenance/gl-accounts"
+        element={withLayout(MainLayout, AddGlAccount)}
+      />
+      <Route
+        path="/bankingandgeneralledger/maintenance/update-account-tags/:id"
+        element={withLayout(MainLayout, UpdateAccountTagsForm)}
+      />
+      <Route
         path="/bankingandgeneralledger/maintenance/currencies"
         element={withLayout(MainLayout, CurrenciesTable)}
       />
@@ -699,6 +952,7 @@ const AppRoutes = () => {
         path="/bankingandgeneralledger/maintenance/update-quick-entry"
         element={withLayout(MainLayout, UpdateQuickEntriesForm)}
       />
+      
       <Route
         path="/bankingandgeneralledger/maintenance/gl-account-groups"
         element={withLayout(MainLayout, GlAccountGroupsTable)}
@@ -820,8 +1074,77 @@ const AppRoutes = () => {
       />
       <Route
         path="/setup/maintenance/install-chart-of-accounts"
-        element={withLayout(MainLayout, AddChartofAccounts)}
+        element={withLayout(MainLayout, InstallChartOfAccounts)}
       />
+      <Route
+        path="/setup/maintenance/void-a-transaction"
+        element={withLayout(MainLayout, VoidTransactionTable)}
+      />
+      <Route
+        path="/setup/maintenance/add-void-a-transaction"
+        element={withLayout(MainLayout, VoidTransaction)}
+      />
+      <Route
+        path="/setup/maintenance/view-or-print-transaction"
+        element={withLayout(MainLayout, ViewPrintTransactions)}
+      />
+      <Route
+        path="/setup/maintenance/attach-documents"
+        element={withLayout(MainLayout, DocumentsTable)}
+      />
+      <Route
+        path="/setup/maintenance/add-document"
+        element={withLayout(MainLayout, AddDocumentsForm)}
+      />
+      <Route
+        path="/setup/maintenance/update-document"
+        element={withLayout(MainLayout, UpdateDocumentsForm)}
+      />
+      <Route
+        path="/setup/maintenance/backup-and-restore"
+        element={withLayout(MainLayout, BackupRestore)}
+      />
+      <Route
+        path="/setup/maintenance/create-update-companies"
+        element={withLayout(MainLayout, CompanyTable)}
+      />
+      <Route
+        path="/setup/maintenance/add-company"
+        element={withLayout(MainLayout, AddCompanyForm)}
+      />
+      <Route
+        path="/setup/maintenance/update-company"
+        element={withLayout(MainLayout, UpdateCompanyForm)}
+      />
+      <Route
+        path="/setup/maintenance/install-languages"
+        element={withLayout(MainLayout, LanguagesTable)}
+      />
+      <Route
+        path="/setup/maintenance/add-language"
+        element={withLayout(MainLayout, AddLanguagesForm)}
+      />
+      <Route
+        path="/setup/maintenance/update-language"
+        element={withLayout(MainLayout, UpdateLanguagesForm)}
+      />
+      <Route
+        path="/setup/maintenance/install-extensions"
+        element={withLayout(MainLayout, InstallExtensions)}
+      />
+      <Route
+        path="/setup/maintenance/install-themes"
+        element={withLayout(MainLayout, InstallThemes)}
+      />
+      <Route
+        path="/setup/maintenance/software-upgrade"
+        element={withLayout(MainLayout, SoftwareUpdateTable)}
+      />
+      <Route
+        path="/setup/maintenance/system-diagnostics"
+        element={withLayout(MainLayout, SystemDiagnostics)}
+      />
+
 
       <Route
         path="/dashboard"

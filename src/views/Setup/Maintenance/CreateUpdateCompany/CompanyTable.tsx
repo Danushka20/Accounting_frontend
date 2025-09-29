@@ -1,11 +1,12 @@
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
+import React, { useState, useEffect, useMemo } from "react";
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
   Box,
   Button,
   Stack,
@@ -14,79 +15,70 @@ import {
   Typography,
   useMediaQuery,
   Theme,
-  Checkbox,
-  FormControlLabel,
 } from "@mui/material";
-import { useMemo, useState, useEffect } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate } from "react-router-dom";
-import Breadcrumb from "../../../../../components/BreadCrumb";
-import PageTitle from "../../../../../components/PageTitle";
-import theme from "../../../../../theme";
-import SearchBar from "../../../../../components/SearchBar";
+import Breadcrumb from "../../../../components/BreadCrumb";
+import PageTitle from "../../../../components/PageTitle";
+import theme from "../../../../theme";
+import SearchBar from "../../../../components/SearchBar";
 
-// Mock API function
-const getContacts = async () => [
+// Mock API
+const getCompanies = async () => [
   {
     id: 1,
-    assignment: "Manager",
-    reference: "REF001",
-    fullName: "John Doe",
-    phone: "123456789",
-    secPhone: "987654321",
-    fax: "111222333",
-    email: "john@example.com",
-    inactive: false,
+    company: "Acme Ltd",
+    host: "localhost",
+    port: "3306",
+    dbUser: "root",
+    dbName: "acme_db",
+    tablePref: "ac_",
+    charset: "utf8",
+    default: true,
   },
   {
     id: 2,
-    assignment: "Assistant",
-    reference: "REF002",
-    fullName: "Jane Smith",
-    phone: "555666777",
-    secPhone: "777666555",
-    fax: "444555666",
-    email: "jane@example.com",
-    inactive: true,
+    company: "Beta Corp",
+    host: "192.168.1.100",
+    port: "3306",
+    dbUser: "admin",
+    dbName: "beta_db",
+    tablePref: "bt_",
+    charset: "utf8mb4",
+    default: false,
   },
 ];
 
-export default function ContactsTable() {
+export default function CompanyTable() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [contacts, setContacts] = useState<any[]>([]);
-  const [showInactive, setShowInactive] = useState(false);
+  const [companies, setCompanies] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
   const navigate = useNavigate();
 
-  // Fetch contacts (mock API)
   useEffect(() => {
-    getContacts().then((data) => setContacts(data));
+    getCompanies().then((data) => setCompanies(data));
   }, []);
 
-  // Filter by inactive & search
   const filteredData = useMemo(() => {
-    let data = showInactive ? contacts : contacts.filter((c) => !c.inactive);
+    if (!searchQuery.trim()) return companies;
 
-    if (searchQuery.trim() !== "") {
-      const lower = searchQuery.toLowerCase();
-      data = data.filter(
-        (c) =>
-          c.assignment.toLowerCase().includes(lower) ||
-          c.reference.toLowerCase().includes(lower) ||
-          c.fullName.toLowerCase().includes(lower) ||
-          c.phone.toLowerCase().includes(lower) ||
-          c.secPhone.toLowerCase().includes(lower) ||
-          c.fax.toLowerCase().includes(lower) ||
-          c.email.toLowerCase().includes(lower)
-      );
-    }
-
-    return data;
-  }, [contacts, showInactive, searchQuery]);
+    const lower = searchQuery.toLowerCase();
+    return companies.filter(
+      (c) =>
+        c.company.toLowerCase().includes(lower) ||
+        c.host.toLowerCase().includes(lower) ||
+        c.port.toLowerCase().includes(lower) ||
+        c.dbUser.toLowerCase().includes(lower) ||
+        c.dbName.toLowerCase().includes(lower) ||
+        c.tablePref.toLowerCase().includes(lower) ||
+        c.charset.toLowerCase().includes(lower) ||
+        (c.default ? "true" : "false").includes(lower)
+    );
+  }, [companies, searchQuery]);
 
   const paginatedData = useMemo(() => {
     if (rowsPerPage === -1) return filteredData;
@@ -102,12 +94,12 @@ export default function ContactsTable() {
   };
 
   const handleDelete = (id: number) => {
-    alert(`Delete contact with id: ${id}`);
+    alert(`Delete company with id: ${id}`);
   };
 
   const breadcrumbItems = [
     { title: "Home", href: "/home" },
-    { title: "Contacts" },
+    { title: "Companies" },
   ];
 
   return (
@@ -125,7 +117,7 @@ export default function ContactsTable() {
         }}
       >
         <Box>
-          <PageTitle title="Contacts" />
+          <PageTitle title="Companies" />
           <Breadcrumb breadcrumbs={breadcrumbItems} />
         </Box>
 
@@ -133,79 +125,79 @@ export default function ContactsTable() {
           <Button
             variant="contained"
             color="primary"
-            onClick={() => navigate("/sales/maintenance/add-and-manage-customers/general-settings")}
+            onClick={() => navigate("/setup/maintenance/add-company")}
           >
-            Add Contact
+            Add Company
           </Button>
 
           <Button
             variant="outlined"
             startIcon={<ArrowBackIcon />}
-            onClick={() => navigate("/sales/maintenance/add-and-manage-customers")}
+            onClick={() => navigate("/setup/maintenance")}
           >
             Back
           </Button>
         </Stack>
       </Box>
 
-      {/* Checkbox & Search */}
+      {/* Search */}
       <Stack
         direction={isMobile ? "column" : "row"}
         spacing={2}
-        sx={{ px: 2, mb: 2, alignItems: "center", justifyContent: "space-between" }}
+        sx={{ px: 2, mb: 2, alignItems: "center", justifyContent: "flex-end" }}
       >
-        <FormControlLabel
-          control={
-            <Checkbox checked={showInactive} onChange={(e) => setShowInactive(e.target.checked)} />
-          }
-          label="Show Also Inactive"
-        />
-
         <Box sx={{ width: isMobile ? "100%" : "300px" }}>
           <SearchBar
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
-            placeholder="Search Contacts"
+            placeholder="Search Companies"
           />
         </Box>
       </Stack>
 
       <Stack sx={{ alignItems: "center" }}>
-        <TableContainer component={Paper} elevation={2} sx={{ overflowX: "auto", maxWidth: isMobile ? "88vw" : "100%" }}>
-          <Table aria-label="contacts table">
+        <TableContainer
+          component={Paper}
+          elevation={2}
+          sx={{ overflowX: "auto", maxWidth: isMobile ? "88vw" : "100%" }}
+        >
+          <Table aria-label="companies table">
             <TableHead sx={{ backgroundColor: "var(--pallet-lighter-blue)" }}>
               <TableRow>
-                <TableCell>Assignment</TableCell>
-                <TableCell>Reference</TableCell>
-                <TableCell>Full Name</TableCell>
-                <TableCell>Phone</TableCell>
-                <TableCell>Sec Phone</TableCell>
-                <TableCell>Fax</TableCell>
-                <TableCell>Email</TableCell>
+                <TableCell>#</TableCell>
+                <TableCell>Company</TableCell>
+                <TableCell>Database Host</TableCell>
+                <TableCell>Database Port</TableCell>
+                <TableCell>Database User</TableCell>
+                <TableCell>Database Name</TableCell>
+                <TableCell>Table Prefix</TableCell>
+                <TableCell>Charset</TableCell>
+                <TableCell>Default</TableCell>
                 <TableCell align="center">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {paginatedData.length > 0 ? (
-                paginatedData.map((contact) => (
-                  <TableRow key={contact.id} hover>
-                    <TableCell>{contact.assignment}</TableCell>
-                    <TableCell>{contact.reference}</TableCell>
-                    <TableCell>{contact.fullName}</TableCell>
-                    <TableCell>{contact.phone}</TableCell>
-                    <TableCell>{contact.secPhone}</TableCell>
-                    <TableCell>{contact.fax}</TableCell>
-                    <TableCell>{contact.email}</TableCell>
+                paginatedData.map((c) => (
+                  <TableRow key={c.id} hover>
+                    <TableCell>{c.id}</TableCell>
+                    <TableCell>{c.company}</TableCell>
+                    <TableCell>{c.host}</TableCell>
+                    <TableCell>{c.port}</TableCell>
+                    <TableCell>{c.dbUser}</TableCell>
+                    <TableCell>{c.dbName}</TableCell>
+                    <TableCell>{c.tablePref}</TableCell>
+                    <TableCell>{c.charset}</TableCell>
+                    <TableCell>{c.default ? "Yes" : "No"}</TableCell>
                     <TableCell align="center">
                       <Stack direction="row" spacing={1} justifyContent="center">
                         <Button
                           variant="contained"
                           size="small"
                           startIcon={<EditIcon />}
-                          onClick={() => navigate(
-                            "/sales/maintenance/add-and-manage-customers/general-settings"
-                            // `/sales/maintenancne/update-contact/${contact.id}`
-                          )}
+                          onClick={() =>
+                            navigate(`/setup/maintenance/update-company/${c.id}`)
+                          }
                         >
                           Edit
                         </Button>
@@ -214,7 +206,7 @@ export default function ContactsTable() {
                           size="small"
                           color="error"
                           startIcon={<DeleteIcon />}
-                          onClick={() => handleDelete(contact.id)}
+                          onClick={() => handleDelete(c.id)}
                         >
                           Delete
                         </Button>
@@ -224,7 +216,7 @@ export default function ContactsTable() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={8} align="center">
+                  <TableCell colSpan={10} align="center">
                     <Typography variant="body2">No Records Found</Typography>
                   </TableCell>
                 </TableRow>
@@ -234,7 +226,7 @@ export default function ContactsTable() {
               <TableRow>
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
-                  colSpan={8}
+                  colSpan={10}
                   count={filteredData.length}
                   rowsPerPage={rowsPerPage}
                   page={page}

@@ -19,7 +19,7 @@ import {
 import theme from "../../../../theme";
 
 interface ItemCategoriesFormData {
-  companyName: string;
+  categoryName: string;
   itemTaxType: string;
   itemType: string;
   unitOfMeasure: string;
@@ -34,7 +34,7 @@ interface ItemCategoriesFormData {
 
 export default function AddItemCategoriesForm() {
   const [formData, setFormData] = useState<ItemCategoriesFormData>({
-    companyName: "",
+    categoryName: "",
     itemTaxType: "",
     itemType: "",
     unitOfMeasure: "",
@@ -70,7 +70,7 @@ export default function AddItemCategoriesForm() {
 
   const validate = () => {
     const newErrors: Partial<ItemCategoriesFormData> = {};
-    if (!formData.companyName) newErrors.companyName = "Company Name is required";
+    if (!formData.categoryName) newErrors.categoryName = "Category Name is required";
     if (!formData.itemTaxType) newErrors.itemTaxType = "Select Item Tax Type";
     if (!formData.itemType) newErrors.itemType = "Select Item Type";
     if (!formData.unitOfMeasure) newErrors.unitOfMeasure = "Select Unit of Measure";
@@ -108,14 +108,14 @@ export default function AddItemCategoriesForm() {
 
         <Stack spacing={2}>
           <TextField
-            label="Company Name"
-            name="companyName"
+            label="Category Name"
+            name="categoryName"
             size="small"
             fullWidth
-            value={formData.companyName}
+            value={formData.categoryName}
             onChange={handleInputChange}
-            error={!!errors.companyName}
-            helperText={errors.companyName || " "}
+            error={!!errors.categoryName}
+            helperText={errors.categoryName || " "}
           />
 
           <Typography variant="subtitle1" sx={{ mt: 2 }}>Default Values for New Items</Typography>
