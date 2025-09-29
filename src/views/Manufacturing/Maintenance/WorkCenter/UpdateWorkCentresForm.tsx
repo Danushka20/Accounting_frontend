@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Stack,
@@ -16,19 +16,43 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import theme from "../../../../theme";
+import { getWorkCentre, updateWorkCentre } from "../../../../api/WorkCentre/WorkCentreApi";
+import { useParams, useNavigate } from "react-router-dom";
 
 interface WorkCentresFormData {
   name: string;
   description: string;
 }
 
+interface UpdateWorkCentreProps {
+  id: string | number; // ID of the item tax type to update
+}
+
 export default function UpdateWorkCentresForm() {
+  const { id } = useParams<{ id: string }>();
   const [formData, setFormData] = useState<WorkCentresFormData>({
     name: "",
     description: "",
   });
 
   const [errors, setErrors] = useState<Partial<WorkCentresFormData>>({});
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!id) return;
+      try {
+        const data = await getWorkCentre(id);
+        setFormData({
+          name: data.name,
+          description: data.description,
+        });
+      } catch (error) {
+        console.error("Failed to fetch Work Centre:", error);
+      }
+    };
+    fetchData();
+  }, [id]);
 
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
@@ -53,10 +77,24 @@ export default function UpdateWorkCentresForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validate()) {
-      console.log("Submitted Data:", formData);
-      alert("Work Centre updated successfully!");
+      const payload = {
+        name: formData.name,
+        description: formData.description,
+      };
+
+      try {
+        setLoading(true);
+        await updateWorkCentre(id, payload);
+        alert("Work Centre updated successfully!");
+        window.history.back();
+      } catch (error) {
+        console.error(error);
+        alert("Failed to update Work Centre");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 

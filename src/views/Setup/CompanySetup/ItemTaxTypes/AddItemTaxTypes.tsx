@@ -12,6 +12,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import theme from "../../../../theme";
+import { createItemTaxType } from "../../../../api/ItemTaxType/ItemTaxTypeApi";
 
 interface ItemTaxTypeFormData {
   description: string;
@@ -48,10 +49,21 @@ export default function AddItemTaxTypes() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validate()) {
-      console.log("Submitted Item Tax Type:", formData);
-      alert("Form submitted successfully!");
+      try {
+        const payload = {
+          name: formData.description,
+          exempt: formData.isFullyTaxExempt,
+        };
+
+        await createItemTaxType(payload);
+        alert("Item Tax Type created successfully!");
+        window.history.back();
+      } catch (error) {
+        console.error(error);
+        alert("Failed to create Item Tax Type");
+      }
     }
   };
 

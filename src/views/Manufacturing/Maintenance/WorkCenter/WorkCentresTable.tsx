@@ -1,88 +1,100 @@
-import React, { useMemo, useState } from "react";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
 import {
   Box,
   Button,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   TableFooter,
   TablePagination,
-  Paper,
   Typography,
   useMediaQuery,
   Theme,
   Checkbox,
   FormControlLabel,
 } from "@mui/material";
+import { useMemo, useState, useEffect } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import Breadcrumb from "../../../../components/BreadCrumb";
 import PageTitle from "../../../../components/PageTitle";
-import SearchBar from "../../../../components/SearchBar";
 import theme from "../../../../theme";
+import SearchBar from "../../../../components/SearchBar";
+import {
+  getWorkCentres as fetchWorkCentres,
+  deleteWorkCentre,
+} from "../../../../api/WorkCentre/WorkCentreApi"; // adjust path
 
-
-const getWorkCentreList = async () => [
-  { id: 1, name: "work centre 1", description: "Description 1", status: "Active" },
-  { id: 2, name: "work centre 2", description: "Description 2", status: "Inactive" },
-  { id: 3, name: "work centre 3", description: "Description 3", status: "Active" },
-  { id: 4, name: "work centre 4", description: "Description 4", status: "Active" },
-];
-
-function WorkCentresTable() {
+export default function WorkCentresTable() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [workCentres, setWorkCentres] = useState<any[]>([]);
   const [showInactive, setShowInactive] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
   const navigate = useNavigate();
 
-  const { data: workCentresData = [] } = useQuery({
-    queryKey: ["workCentre"],
-    queryFn: getWorkCentreList,
-  });
-
-  // Filter with search + showInactive toggle
-  const filteredCentres = useMemo(() => {
-    if (!workCentresData) return [];
-    let filtered = workCentresData;
-
-    if (!showInactive) {
-      filtered = filtered.filter((item) => item.status === "Active");
+  // Fetch data from backend
+  const loadData = async () => {
+    try {
+      const data = await fetchWorkCentres();
+      setWorkCentres(data);
+    } catch (error) {
+      console.error("Failed to fetch Work Centres:", error);
     }
+  };
 
-    if (searchQuery.trim()) {
-      const lowerQuery = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (item) =>
-          item.name.toLowerCase().includes(lowerQuery) ||
-          item.description.toLowerCase().includes(lowerQuery)
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  // Filtered data
+  const filteredData = useMemo(() => {
+    let data = showInactive ? workCentres : workCentres.filter((g) => !g.inactive);
+
+    if (searchQuery.trim() !== "") {
+      const lower = searchQuery.toLowerCase();
+      data = data.filter(
+        (g) =>
+          g.name?.toLowerCase().includes(lower) ||
+          g.description?.toLowerCase().includes(lower)
       );
     }
 
-    return filtered;
-  }, [workCentresData, searchQuery, showInactive]);
+    return data;
+  }, [workCentres, showInactive, searchQuery]);
 
-  const paginatedCentres = useMemo(() => {
-    if (rowsPerPage === -1) return filteredCentres;
-    return filteredCentres.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-  }, [filteredCentres, page, rowsPerPage]);
+  const paginatedData = useMemo(() => {
+    if (rowsPerPage === -1) return filteredData;
+    return filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  }, [page, rowsPerPage, filteredData]);
 
   const handleChangePage = (_event: unknown, newPage: number) => setPage(newPage);
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
-  const handleDelete = (id: number) => {
-    alert(`Delete Unit with id: ${id}`);
+  const handleDelete = async (id: number) => {
+    if (window.confirm("Are you sure you want to delete this Work Centre?")) {
+      try {
+        await deleteWorkCentre(id);
+        alert("Work Centre deleted successfully!");
+        loadData(); // refresh table
+      } catch (error) {
+        console.error(error);
+        alert("Failed to delete Work Centre");
+      }
+    }
   };
 
   const breadcrumbItems = [
@@ -92,7 +104,7 @@ function WorkCentresTable() {
 
   return (
     <Stack>
-      {/* Header with buttons */}
+      {/* Header */}
       <Box
         sx={{
           padding: theme.spacing(2),
@@ -116,29 +128,24 @@ function WorkCentresTable() {
             color="primary"
             onClick={() => navigate("/manufacturing/maintenance/add-work-centres")}
           >
-            Add Work Centres
+            Add Work Centre
           </Button>
 
           <Button
             variant="outlined"
             startIcon={<ArrowBackIcon />}
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/manufacturing/maintenance")}
           >
             Back
           </Button>
         </Stack>
       </Box>
 
-      {/* Search + Show Inactive Toggle */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          px: 2,
-          mb: 2,
-          width: "100%",
-          alignItems: "center",
-        }}
+      {/* Search + Show Inactive */}
+      <Stack
+        direction={isMobile ? "column" : "row"}
+        spacing={2}
+        sx={{ px: 2, mb: 2, alignItems: "center", justifyContent: "space-between" }}
       >
         <FormControlLabel
           control={
@@ -147,13 +154,16 @@ function WorkCentresTable() {
               onChange={(e) => setShowInactive(e.target.checked)}
             />
           }
-          label="Show also Inactive"
+          label="Show Also Inactive"
         />
-
         <Box sx={{ width: isMobile ? "100%" : "300px" }}>
-          <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} placeholder="Search..." />
+          <SearchBar
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            placeholder="Search Name or Description"
+          />
         </Box>
-      </Box>
+      </Stack>
 
       {/* Table */}
       <Stack sx={{ alignItems: "center" }}>
@@ -171,10 +181,9 @@ function WorkCentresTable() {
                 <TableCell align="center">Actions</TableCell>
               </TableRow>
             </TableHead>
-
             <TableBody>
-              {paginatedCentres.length > 0 ? (
-                paginatedCentres.map((item, index) => (
+              {paginatedData.length > 0 ? (
+                paginatedData.map((item, index) => (
                   <TableRow key={item.id} hover>
                     <TableCell>{page * rowsPerPage + index + 1}</TableCell>
                     <TableCell>{item.name}</TableCell>
@@ -185,9 +194,9 @@ function WorkCentresTable() {
                           variant="contained"
                           size="small"
                           startIcon={<EditIcon />}
-                          onClick={() => navigate(
-                            "/manufacturing/maintenance/update-work-centres"
-                        )}
+                          onClick={() =>
+                            navigate(`/manufacturing/maintenance/update-work-centres/${item.id}`)
+                          }
                         >
                           Edit
                         </Button>
@@ -206,19 +215,18 @@ function WorkCentresTable() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={5} align="center">
+                  <TableCell colSpan={4} align="center">
                     <Typography variant="body2">No Records Found</Typography>
                   </TableCell>
                 </TableRow>
               )}
             </TableBody>
-
             <TableFooter>
               <TableRow>
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
-                  colSpan={5}
-                  count={filteredCentres.length}
+                  colSpan={4}
+                  count={filteredData.length}
                   rowsPerPage={rowsPerPage}
                   page={page}
                   onPageChange={handleChangePage}
@@ -234,5 +242,3 @@ function WorkCentresTable() {
     </Stack>
   );
 }
-
-export default WorkCentresTable;

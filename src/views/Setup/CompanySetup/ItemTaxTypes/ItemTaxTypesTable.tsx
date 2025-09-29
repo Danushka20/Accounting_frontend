@@ -26,51 +26,44 @@ import Breadcrumb from "../../../../components/BreadCrumb";
 import PageTitle from "../../../../components/PageTitle";
 import theme from "../../../../theme";
 import SearchBar from "../../../../components/SearchBar";
-
-// Mock API function
-const getItemTaxTypes = async () => [
-  {
-    id: 1,
-    name: "Standard Tax",
-    taxExempt: "No",
-    inactive: false,
-  },
-  {
-    id: 2,
-    name: "Reduced Tax",
-    taxExempt: "Yes",
-    inactive: true,
-  },
-  {
-    id: 3,
-    name: "Luxury Tax",
-    taxExempt: "No",
-    inactive: false,
-  },
-];
+import {
+  getItemTaxTypes as fetchItemTaxTypes,
+  deleteItemTaxType,
+} from "../../../../api/ItemTaxType/ItemTaxTypeApi"; // adjust the path
 
 export default function ItemTaxTypesTable() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [itemTaxTypes, setItemTaxTypes] = useState<any[]>([]);
   const [showInactive, setShowInactive] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(""); // search state
+  const [searchQuery, setSearchQuery] = useState("");
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
   const navigate = useNavigate();
 
-  // Fetch data (simulate API)
+  // Fetch data from backend
+  const loadData = async () => {
+    try {
+      const data = await fetchItemTaxTypes();
+      setItemTaxTypes(data);
+    } catch (error) {
+      console.error("Failed to fetch Item Tax Types:", error);
+    }
+  };
+
   useEffect(() => {
-    getItemTaxTypes().then((data) => setItemTaxTypes(data));
+    loadData();
   }, []);
 
-  // Filter data based on global checkbox & search query
+  // Filtered data
   const filteredData = useMemo(() => {
     let data = showInactive ? itemTaxTypes : itemTaxTypes.filter((g) => !g.inactive);
 
     if (searchQuery.trim() !== "") {
       const lower = searchQuery.toLowerCase();
       data = data.filter(
-        (g) => g.name.toLowerCase().includes(lower) || g.taxExempt.toLowerCase().includes(lower)
+        (g) =>
+          g.description?.toLowerCase().includes(lower) ||
+          (g.isFullyTaxExempt ? "yes" : "no").includes(lower)
       );
     }
 
@@ -94,8 +87,17 @@ export default function ItemTaxTypesTable() {
     setPage(0);
   };
 
-  const handleDelete = (id: number) => {
-    alert(`Delete item tax type with id: ${id}`);
+  const handleDelete = async (id: number) => {
+    if (window.confirm("Are you sure you want to delete this item tax type?")) {
+      try {
+        await deleteItemTaxType(id);
+        alert("Item Tax Type deleted successfully!");
+        loadData(); // refresh table
+      } catch (error) {
+        console.error(error);
+        alert("Failed to delete Item Tax Type");
+      }
+    }
   };
 
   const breadcrumbItems = [
@@ -161,7 +163,7 @@ export default function ItemTaxTypesTable() {
           <SearchBar
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
-            placeholder="Search Name or Tax Exempt"
+            placeholder="Search Description or Tax Exempt"
           />
         </Box>
       </Stack>
@@ -175,7 +177,7 @@ export default function ItemTaxTypesTable() {
           <Table aria-label="item tax types table">
             <TableHead sx={{ backgroundColor: "var(--pallet-lighter-blue)" }}>
               <TableRow>
-                <TableCell>Name</TableCell>
+                <TableCell>Description</TableCell>
                 <TableCell>Tax Exempt</TableCell>
                 <TableCell align="center">Actions</TableCell>
               </TableRow>
@@ -185,14 +187,16 @@ export default function ItemTaxTypesTable() {
                 paginatedData.map((item) => (
                   <TableRow key={item.id} hover>
                     <TableCell>{item.name}</TableCell>
-                    <TableCell>{item.taxExempt}</TableCell>
+                    <TableCell>{item.exempt ? "Yes" : "No"}</TableCell>
                     <TableCell align="center">
                       <Stack direction="row" spacing={1} justifyContent="center">
                         <Button
                           variant="contained"
                           size="small"
                           startIcon={<EditIcon />}
-                          onClick={() => navigate("/setup/companysetup/update-item-tax-types")}
+                          onClick={() =>
+                            navigate(`/setup/companysetup/update-item-tax-types/${item.id}`)
+                          }
                         >
                           Edit
                         </Button>

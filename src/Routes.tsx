@@ -607,7 +607,7 @@ const AppRoutes = () => {
         element={withLayout(MainLayout, AddCreditStatusForm)}
       />
       <Route
-        path="/sales/maintenance/credit-status-setup/update-credit-status"
+        path="/sales/maintenance/credit-status-setup/update-credit-status/:id"
         element={withLayout(MainLayout, UpdateCreditStatusForm)}
       />
 
@@ -686,7 +686,7 @@ const AppRoutes = () => {
         element={withLayout(MainLayout, AddUnitsOfMeasureForm)}
       />
       <Route
-        path="/itemsandinventory/maintenance/units-of-measure/update-units-of-measure"
+        path="/itemsandinventory/maintenance/units-of-measure/update-units-of-measure/:id"
         element={withLayout(MainLayout, UpdateUnitsOfMeasureForm)}
       />
       <Route
@@ -821,7 +821,7 @@ const AppRoutes = () => {
         element={withLayout(MainLayout, AddWorkCentresForm)}
       />
       <Route
-        path="/manufacturing/maintenance/update-work-centres"
+        path="/manufacturing/maintenance/update-work-centres/:id"
         element={withLayout(MainLayout, UpdateWorkCentresForm)}
       />
 
@@ -1056,7 +1056,7 @@ const AppRoutes = () => {
         element={withLayout(MainLayout, AddItemTaxTypes)}
       />
       <Route
-        path="/setup/companysetup/update-item-tax-types"
+        path="/setup/companysetup/update-item-tax-types/:id"
         element={withLayout(MainLayout, UpdateItemTaxTypes)}
       />
       <Route

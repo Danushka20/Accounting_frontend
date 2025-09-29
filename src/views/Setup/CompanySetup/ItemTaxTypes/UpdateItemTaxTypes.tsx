@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Stack,
@@ -12,13 +12,20 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import theme from "../../../../theme";
+import { getItemTaxType, updateItemTaxType } from "../../../../api/ItemTaxType/ItemTaxTypeApi";
+import { useParams, useNavigate } from "react-router-dom";
 
 interface ItemTaxTypeFormData {
   description: string;
   isFullyTaxExempt: boolean;
 }
 
+interface UpdateItemTaxTypesProps {
+  id: string | number; // ID of the item tax type to update
+}
+
 export default function UpdateItemTaxTypes() {
+  const { id } = useParams<{ id: string }>();
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
 
@@ -26,8 +33,25 @@ export default function UpdateItemTaxTypes() {
     description: "",
     isFullyTaxExempt: false,
   });
-
   const [errors, setErrors] = useState<Partial<ItemTaxTypeFormData>>({});
+  const [loading, setLoading] = useState(false);
+
+  // Fetch existing data
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!id) return;
+      try {
+        const data = await getItemTaxType(id);
+        setFormData({
+          description: data.name,
+          isFullyTaxExempt: data.exempt,
+        });
+      } catch (error) {
+        console.error("Failed to fetch Item Tax Type:", error);
+      }
+    };
+    fetchData();
+  }, [id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -39,19 +63,31 @@ export default function UpdateItemTaxTypes() {
 
   const validate = (): boolean => {
     const newErrors: Partial<ItemTaxTypeFormData> = {};
-
     if (!formData.description) {
       newErrors.description = "Description is required";
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validate()) {
-      console.log("Submitted Item Tax Type:", formData);
-      alert("Form submitted successfully!");
+      const payload = {
+        name: formData.description,
+        exempt: formData.isFullyTaxExempt,
+      };
+
+      try {
+        setLoading(true);
+        await updateItemTaxType(id, payload);
+        alert("Item Tax Type updated successfully!");
+        window.history.back();
+      } catch (error) {
+        console.error(error);
+        alert("Failed to update Item Tax Type");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -70,7 +106,7 @@ export default function UpdateItemTaxTypes() {
           variant="h6"
           sx={{ mb: 3, textAlign: isMobile ? "center" : "left" }}
         >
-          Item Tax Type Setup
+          Update Item Tax Type
         </Typography>
 
         <Stack spacing={2}>
@@ -119,8 +155,9 @@ export default function UpdateItemTaxTypes() {
             variant="contained"
             sx={{ backgroundColor: "var(--pallet-blue)" }}
             onClick={handleSubmit}
+            disabled={loading}
           >
-            Update
+            {loading ? "Updating..." : "Update"}
           </Button>
         </Box>
       </Paper>

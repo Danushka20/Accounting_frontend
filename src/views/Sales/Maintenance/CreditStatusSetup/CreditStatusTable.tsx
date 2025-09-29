@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Box,
   Button,
@@ -21,68 +21,78 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import Breadcrumb from "../../../../components/BreadCrumb";
 import PageTitle from "../../../../components/PageTitle";
 import SearchBar from "../../../../components/SearchBar";
 import theme from "../../../../theme";
+import {
+  getCreditStatusSetups,
+  deleteCreditStatusSetup,
+} from "../../../../api/CreditStatusSetup/CreditStatusSetupApi";
 
-// Mock API function for Credit Status
-const getCreditStatusList = async () => [
-  { id: 1, description: "Good history", disallowInvoices: true, status: "Active" },
-  { id: 2, description: "Blocked", disallowInvoices: false, status: "Inactive" },
-  { id: 3, description: "Limited", disallowInvoices: false, status: "Inctive" },
-  { id: 4, description: "Good History", disallowInvoices: true, status: "Active" },
-];
-
-function CreditStatusTable() {
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+export default function CreditStatusTable() {
+  const [creditStatuses, setCreditStatuses] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [showInactive, setShowInactive] = useState(false);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
   const navigate = useNavigate();
 
-  const { data: creditStatusData = [] } = useQuery({
-    queryKey: ["creditStatus"],
-    queryFn: getCreditStatusList,
-  });
-
-  // Filter with search + inactive toggle
-  const filteredCreditStatus = useMemo(() => {
-    if (!creditStatusData) return [];
-    let filtered = creditStatusData;
-
-    if (!showInactive) {
-      filtered = filtered.filter((item) => item.status === "Active");
+  // Fetch data from backend
+  const loadData = async () => {
+    try {
+      const data = await getCreditStatusSetups();
+      setCreditStatuses(data);
+    } catch (error) {
+      console.error("Failed to fetch credit statuses:", error);
     }
+  };
 
-    if (searchQuery.trim()) {
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  // Filtered + search + show inactive
+  const filteredData = useMemo(() => {
+    let data = showInactive ? creditStatuses : creditStatuses.filter((item) => !item.inactive);
+
+    if (searchQuery.trim() !== "") {
       const lowerQuery = searchQuery.toLowerCase();
-      filtered = filtered.filter(
+      data = data.filter(
         (item) =>
-          item.description.toLowerCase().includes(lowerQuery) ||
-          (item.disallowInvoices ? "Invoice Ok" : "No Invoicing").includes(lowerQuery)
+          item.reason_description.toLowerCase().includes(lowerQuery) ||
+          (item.disallow_invoices ? "Yes" : "No").toLowerCase().includes(lowerQuery)
       );
     }
 
-    return filtered;
-  }, [creditStatusData, searchQuery, showInactive]);
+    return data;
+  }, [creditStatuses, searchQuery, showInactive]);
 
-  const paginatedCreditStatus = useMemo(() => {
-    if (rowsPerPage === -1) return filteredCreditStatus;
-    return filteredCreditStatus.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-  }, [filteredCreditStatus, page, rowsPerPage]);
+  const paginatedData = useMemo(() => {
+    if (rowsPerPage === -1) return filteredData;
+    return filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  }, [filteredData, page, rowsPerPage]);
 
   const handleChangePage = (_event: unknown, newPage: number) => setPage(newPage);
+
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
-  const handleDelete = (id: number) => {
-    alert(`Delete Credit Status with id: ${id}`);
+  const handleDelete = async (id: number) => {
+    if (window.confirm("Are you sure you want to delete this Credit Status?")) {
+      try {
+        await deleteCreditStatusSetup(id);
+        alert("Deleted successfully!");
+        loadData(); // refresh table
+      } catch (error) {
+        console.error(error);
+        alert("Failed to delete Credit Status");
+      }
+    }
   };
 
   const breadcrumbItems = [
@@ -92,7 +102,7 @@ function CreditStatusTable() {
 
   return (
     <Stack>
-      {/* Header with buttons */}
+      {/* Header */}
       <Box
         sx={{
           padding: theme.spacing(2),
@@ -129,16 +139,11 @@ function CreditStatusTable() {
         </Stack>
       </Box>
 
-      {/* Search + Show Inactive Toggle */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          px: 2,
-          mb: 2,
-          width: "100%",
-          alignItems: "center",
-        }}
+      {/* Search + Show Inactive */}
+      <Stack
+        direction={isMobile ? "column" : "row"}
+        spacing={2}
+        sx={{ px: 2, mb: 2, alignItems: "center", justifyContent: "space-between" }}
       >
         <FormControlLabel
           control={
@@ -147,25 +152,20 @@ function CreditStatusTable() {
               onChange={(e) => setShowInactive(e.target.checked)}
             />
           }
-          label="Show also Inactive"
+          label="Show Also Inactive"
         />
-
         <Box sx={{ width: isMobile ? "100%" : "300px" }}>
           <SearchBar
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
-            placeholder="Search..."
+            placeholder="Search Description or Disallow Invoices"
           />
         </Box>
-      </Box>
+      </Stack>
 
       {/* Table */}
       <Stack sx={{ alignItems: "center" }}>
-        <TableContainer
-          component={Paper}
-          elevation={2}
-          sx={{ overflowX: "auto", maxWidth: isMobile ? "88vw" : "100%" }}
-        >
+        <TableContainer component={Paper} elevation={2} sx={{ overflowX: "auto", maxWidth: isMobile ? "88vw" : "100%" }}>
           <Table aria-label="credit status table">
             <TableHead sx={{ backgroundColor: "var(--pallet-lighter-blue)" }}>
               <TableRow>
@@ -177,19 +177,21 @@ function CreditStatusTable() {
             </TableHead>
 
             <TableBody>
-              {paginatedCreditStatus.length > 0 ? (
-                paginatedCreditStatus.map((item, index) => (
+              {paginatedData.length > 0 ? (
+                paginatedData.map((item, index) => (
                   <TableRow key={item.id} hover>
                     <TableCell>{page * rowsPerPage + index + 1}</TableCell>
-                    <TableCell>{item.description}</TableCell>
-                    <TableCell>{item.disallowInvoices ? "Invoice Ok" : "No Invoicing"}</TableCell>
+                    <TableCell>{item.reason_description}</TableCell>
+                    <TableCell>{item.disallow_invoices ? "Yes" : "No"}</TableCell>
                     <TableCell align="center">
                       <Stack direction="row" spacing={1} justifyContent="center">
                         <Button
                           variant="contained"
                           size="small"
                           startIcon={<EditIcon />}
-                          onClick={() => navigate("/sales/maintenance/credit-status-setup/update-credit-status")}
+                          onClick={() =>
+                            navigate(`/sales/maintenance/credit-status-setup/update-credit-status/${item.id}`)
+                          }
                         >
                           Edit
                         </Button>
@@ -220,7 +222,7 @@ function CreditStatusTable() {
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
                   colSpan={4}
-                  count={filteredCreditStatus.length}
+                  count={filteredData.length}
                   rowsPerPage={rowsPerPage}
                   page={page}
                   onPageChange={handleChangePage}
@@ -236,5 +238,3 @@ function CreditStatusTable() {
     </Stack>
   );
 }
-
-export default CreditStatusTable;
