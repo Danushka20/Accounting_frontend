@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -15,74 +15,75 @@ import {
   Typography,
   useMediaQuery,
   Theme,
-  Checkbox,
-  FormControlLabel,
+  TextField,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import Breadcrumb from "../../../../components/BreadCrumb";
 import PageTitle from "../../../../components/PageTitle";
-import SearchBar from "../../../../components/SearchBar";
 import theme from "../../../../theme";
+import { getItemUnits, deleteItemUnit } from "../../../../api/ItemUnit/ItemUnitApi";
+import SearchBar from "../../../../components/SearchBar";
 
-// API function to get Units of Measure
-const getUnitsOfMeasureList = async () => [
-  { id: 1, unit: "kg", description: "Kilogram", decimals: 2, status: "Active" },
-  { id: 2, unit: "pcs", description: "Pieces", decimals: 0, status: "Inactive" },
-  { id: 3, unit: "ltr", description: "Liter", decimals: 3, status: "Active" },
-  { id: 4, unit: "m", description: "Meter", decimals: 2, status: "Active" },
-];
-
-function UnitsOfMeasureTable() {
+export default function UnitsOfMeasureTable() {
+  const [unitsData, setUnitsData] = useState<any[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchQuery, setSearchQuery] = useState("");
-  const [showInactive, setShowInactive] = useState(false);
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
   const navigate = useNavigate();
 
-  const { data: unitsData = [] } = useQuery({
-    queryKey: ["unitsOfMeasure"],
-    queryFn: getUnitsOfMeasureList,
-  });
+  // Fetch units from backend
+  const loadData = async () => {
+    try {
+      const data = await getItemUnits();
+      setUnitsData(data);
+    } catch (error) {
+      console.error("Failed to fetch Units of Measure:", error);
+      alert("Failed to load units. Please check backend.");
+    }
+  };
 
-  // Filter with search + showInactive toggle
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  // Filter units based on search query
   const filteredUnits = useMemo(() => {
-    if (!unitsData) return [];
-    let filtered = unitsData;
+    if (!searchQuery.trim()) return unitsData;
+    const lowerQuery = searchQuery.toLowerCase();
+    return unitsData.filter(
+      (u) =>
+        u.abbr.toLowerCase().includes(lowerQuery) ||
+        u.name.toLowerCase().includes(lowerQuery)
+    );
+  }, [unitsData, searchQuery]);
 
-    if (!showInactive) {
-      filtered = filtered.filter((item) => item.status === "Active");
-    }
-
-    if (searchQuery.trim()) {
-      const lowerQuery = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (item) =>
-          item.unit.toLowerCase().includes(lowerQuery) ||
-          item.description.toLowerCase().includes(lowerQuery)
-      );
-    }
-
-    return filtered;
-  }, [unitsData, searchQuery, showInactive]);
-
+  // Pagination
   const paginatedUnits = useMemo(() => {
     if (rowsPerPage === -1) return filteredUnits;
     return filteredUnits.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
   }, [filteredUnits, page, rowsPerPage]);
 
-  const handleChangePage = (_event: unknown, newPage: number) => setPage(newPage);
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
+  const handleChangePage = (_: unknown, newPage: number) => setPage(newPage);
+  const handleChangeRowsPerPage = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setRowsPerPage(parseInt(e.target.value, 10));
     setPage(0);
   };
 
-  const handleDelete = (id: number) => {
-    alert(`Delete Unit with id: ${id}`);
+  const handleDelete = async (id: number | string) => {
+    if (window.confirm("Are you sure you want to delete this unit?")) {
+      try {
+        await deleteItemUnit(id);
+        alert("Unit deleted successfully!");
+        loadData();
+      } catch (error) {
+        console.error(error);
+        alert("Failed to delete unit");
+      }
+    }
   };
 
   const breadcrumbItems = [
@@ -91,18 +92,17 @@ function UnitsOfMeasureTable() {
   ];
 
   return (
-    <Stack>
-      {/* Header with buttons */}
+    <Stack spacing={2}>
+      {/* Header */}
       <Box
         sx={{
           padding: theme.spacing(2),
           boxShadow: 2,
-          marginY: 2,
           borderRadius: 1,
-          overflowX: "hidden",
           display: "flex",
-          alignItems: "center",
           justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
         }}
       >
         <Box>
@@ -110,132 +110,108 @@ function UnitsOfMeasureTable() {
           <Breadcrumb breadcrumbs={breadcrumbItems} />
         </Box>
 
-        <Stack direction="row" spacing={1}>
+        <Stack direction="row" spacing={1} sx={{ mt: isMobile ? 1 : 0 }}>
           <Button
             variant="contained"
             color="primary"
-            onClick={() => navigate("/itemsandinventory/maintenance/units-of-measure/add-units-of-measure")}
+            onClick={() =>
+              navigate("/itemsandinventory/maintenance/units-of-measure/add-units-of-measure")
+            }
           >
             Add Unit
           </Button>
-
-          <Button
-            variant="outlined"
-            startIcon={<ArrowBackIcon />}
-            onClick={() => navigate(-1)}
-          >
+          <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={() => navigate(-1)}>
             Back
           </Button>
         </Stack>
       </Box>
 
-      {/* Search + Show Inactive Toggle */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          px: 2,
-          mb: 2,
-          width: "100%",
-          alignItems: "center",
-        }}
-      >
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={showInactive}
-              onChange={(e) => setShowInactive(e.target.checked)}
-            />
-          }
-          label="Show also Inactive"
-        />
-
-        <Box sx={{ width: isMobile ? "100%" : "300px" }}>
-          <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} placeholder="Search..." />
+      {/* Search */}
+      {/* Search Bar at the top-right */}
+      <Box sx={{ display: "flex", justifyContent: "flex-end", width: "100%", mb: 2 }}>
+        <Box sx={{ width: isMobile ? "150px" : "250px" }}>
+          <SearchBar
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            placeholder="Search Abbr or Name"
+          />
         </Box>
       </Box>
 
       {/* Table */}
-      <Stack sx={{ alignItems: "center" }}>
-        <TableContainer
-          component={Paper}
-          elevation={2}
-          sx={{ overflowX: "auto", maxWidth: isMobile ? "88vw" : "100%" }}
-        >
-          <Table aria-label="units of measure table">
-            <TableHead sx={{ backgroundColor: "var(--pallet-lighter-blue)" }}>
-              <TableRow>
-                <TableCell>No</TableCell>
-                <TableCell>Unit</TableCell>
-                <TableCell>Description</TableCell>
-                <TableCell>Decimals</TableCell>
-                <TableCell align="center">Actions</TableCell>
-              </TableRow>
-            </TableHead>
+      <TableContainer component={Paper} sx={{ overflowX: "auto", maxWidth: "100%", p: 1 }}>
+        <Table>
+          <TableHead sx={{ backgroundColor: "var(--pallet-lighter-blue)" }}>
+            <TableRow>
+              <TableCell>No</TableCell>
+              <TableCell>Unit</TableCell>
+              <TableCell>Description</TableCell>
+              <TableCell>Decimals</TableCell>
+              <TableCell align="center">Actions</TableCell>
+            </TableRow>
+          </TableHead>
 
-            <TableBody>
-              {paginatedUnits.length > 0 ? (
-                paginatedUnits.map((item, index) => (
-                  <TableRow key={item.id} hover>
-                    <TableCell>{page * rowsPerPage + index + 1}</TableCell>
-                    <TableCell>{item.unit}</TableCell>
-                    <TableCell>{item.description}</TableCell>
-                    <TableCell>{item.decimals}</TableCell>
-                    <TableCell align="center">
-                      <Stack direction="row" spacing={1} justifyContent="center">
-                        <Button
-                          variant="contained"
-                          size="small"
-                          startIcon={<EditIcon />}
-                          onClick={() => navigate(
-                            "/itemsandinventory/maintenance/units-of-measure/update-units-of-measure"
-                            // `/inventory/units-of-measure/edit/${item.id}`
-                        )}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          color="error"
-                          startIcon={<DeleteIcon />}
-                          onClick={() => handleDelete(item.id)}
-                        >
-                          Delete
-                        </Button>
-                      </Stack>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={5} align="center">
-                    <Typography variant="body2">No Records Found</Typography>
+          <TableBody>
+            {paginatedUnits.length > 0 ? (
+              paginatedUnits.map((item, index) => (
+                <TableRow key={item.id} hover>
+                  <TableCell>{page * rowsPerPage + index + 1}</TableCell>
+                  <TableCell>{item.abbr}</TableCell>
+                  <TableCell>{item.name}</TableCell>
+                  <TableCell>{item.decimals}</TableCell>
+                  <TableCell align="center">
+                    <Stack direction="row" spacing={1} justifyContent="center">
+                      <Button
+                        variant="contained"
+                        size="small"
+                        startIcon={<EditIcon />}
+                        onClick={() =>
+                          navigate(
+                            `/itemsandinventory/maintenance/units-of-measure/update-units-of-measure/${item.id}`
+                          )
+                        }
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        color="error"
+                        startIcon={<DeleteIcon />}
+                        onClick={() => handleDelete(item.id)}
+                      >
+                        Delete
+                      </Button>
+                    </Stack>
                   </TableCell>
                 </TableRow>
-              )}
-            </TableBody>
-
-            <TableFooter>
+              ))
+            ) : (
               <TableRow>
-                <TablePagination
-                  rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
-                  colSpan={5}
-                  count={filteredUnits.length}
-                  rowsPerPage={rowsPerPage}
-                  page={page}
-                  onPageChange={handleChangePage}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
-                  showFirstButton
-                  showLastButton
-                />
+                <TableCell colSpan={5} align="center">
+                  <Typography>No Records Found</Typography>
+                </TableCell>
               </TableRow>
-            </TableFooter>
-          </Table>
-        </TableContainer>
-      </Stack>
+            )}
+          </TableBody>
+
+          <TableFooter>
+            <TableRow>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
+                colSpan={5}
+                count={filteredUnits.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                showFirstButton
+                showLastButton
+              />
+            </TableRow>
+          </TableFooter>
+        </Table>
+      </TableContainer>
     </Stack>
   );
 }
-
-export default UnitsOfMeasureTable;

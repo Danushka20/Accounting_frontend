@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Stack,
@@ -16,22 +16,44 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import theme from "../../../../theme";
-
+import { getCreditStatusSetup, updateCreditStatusSetup } from "../../../../api/CreditStatusSetup/CreditStatusSetupApi";
+import { useParams, useNavigate } from "react-router-dom";
 interface CreditStatusFormData {
   description: string;
   disallowInvoicing: string; // "yes" or "no"
 }
 
+interface UpdateCreditStatusProps {
+  id: string | number;
+}
+
 export default function UpdateCreditStatusForm() {
+  const { id } = useParams<{ id: string }>();
   const [formData, setFormData] = useState<CreditStatusFormData>({
     description: "",
     disallowInvoicing: "",
   });
 
   const [errors, setErrors] = useState<Partial<CreditStatusFormData>>({});
-
+  const [loading, setLoading] = useState(false);
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!id) return;
+      try {
+        const data = await getCreditStatusSetup(id);
+        setFormData({
+          description: data.reason_description,
+          disallowInvoicing: data.disallow_invoices ? "yes" : "no",
+        });
+      } catch (error) {
+        console.error("Failed to fetch Item Tax Type:", error);
+      }
+    };
+    fetchData();
+  }, [id]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -59,10 +81,24 @@ export default function UpdateCreditStatusForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validate()) {
-      console.log("Submitted Data:", formData);
-      alert("Credit Status updated successfully!");
+      const payload = {
+        reason_description: formData.description,
+        disallow_invoices: formData.disallowInvoicing === "yes" ? 1 : 0,
+      };
+
+      try {
+        setLoading(true);
+        await updateCreditStatusSetup(id, payload);
+        alert("Credit status setup updated successfully!");
+        window.history.back();
+      } catch (error) {
+        console.error(error);
+        alert("Failed to updated Credit status setup");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 

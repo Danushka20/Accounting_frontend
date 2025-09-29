@@ -16,6 +16,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import theme from "../../../../theme";
+import { createItemUnit } from "../../../../api/ItemUnit/ItemUnitApi";
 
 interface UnitsOfMeasureFormData {
   unitAbbreviation: string;
@@ -56,12 +57,24 @@ export default function AddUnitsOfMeasureForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
-    if (validate()) {
-      console.log("Submitted Data:", formData);
-      alert("Unit of Measure added successfully!");
-    }
-  };
+  const handleSubmit = async () => {
+      if (validate()) {
+        try {
+          const payload = {
+            abbr: formData.unitAbbreviation,
+            name: formData.descriptionName,
+            decimals: Number(formData.decimalPlaces),
+          };
+  
+          await createItemUnit(payload);
+          alert("Item Unit created successfully!");
+          window.history.back();
+        } catch (error) {
+          console.error(error);
+          alert("Failed to create Item Unit");
+        }
+      }
+    };
 
   return (
     <Stack alignItems="center" sx={{ mt: 4, px: isMobile ? 2 : 0 }}>

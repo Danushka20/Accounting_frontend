@@ -16,10 +16,11 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import theme from "../../../../theme";
+import { createCreditStatusSetup } from "../../../../api/CreditStatusSetup/CreditStatusSetupApi";
 
 interface CreditStatusFormData {
   description: string;
-  disallowInvoicing: string; // "yes" or "no"
+  disallowInvoicing: string;
 }
 
 export default function AddCreditStatusForm() {
@@ -59,12 +60,23 @@ export default function AddCreditStatusForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
-    if (validate()) {
-      console.log("Submitted Data:", formData);
-      alert("Credit Status added successfully!");
-    }
-  };
+  const handleSubmit = async () => {
+        if (validate()) {
+          try {
+            const payload = {
+              reason_description: formData.description,
+              disallow_invoices: formData.disallowInvoicing === "yes" ? 1 : 0,
+            };
+    
+            await createCreditStatusSetup(payload);
+            alert("Credit Status Setup created successfully!");
+            window.history.back();
+          } catch (error) {
+            console.error(error);
+            alert("Failed to create Credit Status Setup");
+          }
+        }
+      };
 
   return (
     <Stack alignItems="center" sx={{ mt: 4, px: isMobile ? 2 : 0 }}>

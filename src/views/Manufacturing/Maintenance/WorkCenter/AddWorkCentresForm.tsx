@@ -16,6 +16,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import theme from "../../../../theme";
+import { createWorkCentre } from "../../../../api/WorkCentre/WorkCentreApi";
 
 interface WorkCentresFormData {
   name: string;
@@ -53,12 +54,23 @@ export default function AddWorkCentresForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
-    if (validate()) {
-      console.log("Submitted Data:", formData);
-      alert("Work Centre added successfully!");
-    }
-  };
+  const handleSubmit = async () => {
+      if (validate()) {
+        try {
+          const payload = {
+            name: formData.name,
+            description: formData.description,
+          };
+  
+          await createWorkCentre(payload);
+          alert("Work Centre created successfully!");
+          window.history.back();
+        } catch (error) {
+          console.error(error);
+          alert("Failed to create Work Centre");
+        }
+      }
+    };
 
   return (
     <Stack alignItems="center" sx={{ mt: 4, px: isMobile ? 2 : 0 }}>
