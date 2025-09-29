@@ -9,6 +9,8 @@ import {
   useTheme,
   useMediaQuery,
 } from "@mui/material";
+import { createTag } from "../../../../api/DimensionTag/DimensionTagApi";
+import { useNavigate } from "react-router-dom";
 
 interface DimensionTagData {
   tagName: string;
@@ -22,6 +24,7 @@ export default function AddDimensionTagsForm() {
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof DimensionTagData, string>>>({});
+  const navigate = useNavigate();
 
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
@@ -33,18 +36,21 @@ export default function AddDimensionTagsForm() {
 
   const validate = () => {
     const newErrors: Partial<Record<keyof DimensionTagData, string>> = {};
-
     if (!formData.tagName.trim()) newErrors.tagName = "Tag Name is required";
     if (!formData.tagDescription.trim()) newErrors.tagDescription = "Tag Description is required";
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validate()) {
-      console.log("Submitted Dimension Tag:", formData);
-      alert("Dimension Tag added successfully!");
+      try {
+        await createTag(formData);
+        alert("Dimension Tag added successfully!");
+        navigate("/dimension/maintenance/dimension-tags");
+      } catch (error) {
+        console.error("Error adding tag:", error);
+      }
     }
   };
 

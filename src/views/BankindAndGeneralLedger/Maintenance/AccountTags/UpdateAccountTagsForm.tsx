@@ -40,7 +40,7 @@ export default function UpdateAccountTags() {
     if (id) {
       getAccountTag(Number(id)).then((data) =>
         setFormData({
-          tagName: data.tag_name,
+          tagName: data.name,
           description: data.description || "",
         })
       );
@@ -69,8 +69,10 @@ export default function UpdateAccountTags() {
 
     try {
       const payload = {
-        tag_name: formData.tagName,
+        name: formData.tagName,
         description: formData.description,
+        type: 1,
+        inactive: false,
       };
 
       await updateAccountTag(Number(id), payload);

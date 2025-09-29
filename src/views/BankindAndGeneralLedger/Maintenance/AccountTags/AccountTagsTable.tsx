@@ -110,7 +110,6 @@ export default function AccountTagsTable() {
       </Box>
 
       {/* Search */}
-      {/* Search */}
       <Stack
         direction="row"
         spacing={2}
@@ -144,8 +143,8 @@ export default function AccountTagsTable() {
               {paginatedData.length > 0 ? (
                 paginatedData.map((tag) => (
                   <TableRow key={tag.id} hover>
-                    <TableCell>{tag.tag_name}</TableCell>
-                    <TableCell>{tag.tag_description}</TableCell>
+                    <TableCell>{tag.name}</TableCell>
+                    <TableCell>{tag.description}</TableCell>
                     <TableCell align="center">
                       <Stack direction="row" spacing={1} justifyContent="center">
                         <Button
@@ -154,8 +153,7 @@ export default function AccountTagsTable() {
                           startIcon={<EditIcon />}
                           onClick={() =>
                             navigate(
-                              "/bankingandgeneralledger/maintenance/update-account-tags"
-                              // `/bankingandgeneralledger/maintenance/update-account-tags/${tag.id}`
+                              `/bankingandgeneralledger/maintenance/update-account-tags/${tag.id}`
                             )
                           }
                         >

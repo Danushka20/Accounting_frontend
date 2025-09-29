@@ -55,8 +55,10 @@ export default function AddAccountTagsForm() {
 
     try {
       const payload = {
-        tag_name: formData.tagName,
-        tag_description: formData.tagDescription,
+        name: formData.tagName,
+        description: formData.tagDescription,
+        type: 1,
+        inactive: false, 
       };
 
       const tag = await createAccountTag(payload);
@@ -72,7 +74,7 @@ export default function AddAccountTagsForm() {
       });
       setErrors({});
 
-      navigate("/bankingandgeneralledger/maintenance/accounttags");
+      navigate("/bankingandgeneralledger/maintenance/account-tags");
     } catch (err: any) {
       alert("Error creating account tag: " + JSON.stringify(err));
     }

@@ -9,15 +9,17 @@ import {
   useTheme,
   useMediaQuery,
 } from "@mui/material";
+import { createLocation } from "../../../../api/FixedAssetsLocation/FixedAssetsLocationApi";
+import { useNavigate } from "react-router-dom";
 
 interface FixedAssetsLocationData {
   locationCode: string;
   locationName: string;
-  contactDeliveries: string;
+  contact: string;
   address: string;
-  telNumber: string;
-  secondaryTelNumber: string;
-  faxNumber: string;
+  phone: string;
+  secondaryPhone: string;
+  fax: string;
   email: string;
 }
 
@@ -25,18 +27,18 @@ export default function AddFixedAssetsLocations() {
   const [formData, setFormData] = useState<FixedAssetsLocationData>({
     locationCode: "",
     locationName: "",
-    contactDeliveries: "",
+    contact: "",
     address: "",
-    telNumber: "",
-    secondaryTelNumber: "",
-    faxNumber: "",
+    phone: "",
+    secondaryPhone: "",
+    fax: "",
     email: "",
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof FixedAssetsLocationData, string>>>({});
-
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
+  const navigate = useNavigate();
 
   const handleChange = (field: keyof FixedAssetsLocationData, value: string) => {
     setFormData({ ...formData, [field]: value });
@@ -51,13 +53,13 @@ export default function AddFixedAssetsLocations() {
 
     if (!formData.locationCode.trim()) newErrors.locationCode = "Location Code is required";
     if (!formData.locationName.trim()) newErrors.locationName = "Location Name is required";
-    if (!formData.contactDeliveries.trim()) newErrors.contactDeliveries = "Contact for Deliveries is required";
+    if (!formData.contact.trim()) newErrors.contact = "Contact for Deliveries is required";
     if (!formData.address.trim()) newErrors.address = "Address is required";
-    if (!formData.telNumber.trim()) newErrors.telNumber = "Telephone Number is required";
-    else if (!phoneRegex.test(formData.telNumber)) newErrors.telNumber = "Enter a valid 10-digit number";
-    if (formData.secondaryTelNumber && !phoneRegex.test(formData.secondaryTelNumber))
-      newErrors.secondaryTelNumber = "Enter a valid 10-digit secondary number";
-    if (formData.faxNumber && !faxRegex.test(formData.faxNumber)) newErrors.faxNumber = "Enter a valid fax number (6-15 digits)";
+    if (!formData.phone.trim()) newErrors.phone = "Telephone Number is required";
+    else if (!phoneRegex.test(formData.phone)) newErrors.phone = "Enter a valid 10-digit number";
+    if (formData.secondaryPhone && !phoneRegex.test(formData.secondaryPhone))
+      newErrors.secondaryPhone = "Enter a valid 10-digit secondary number";
+    if (formData.fax && !faxRegex.test(formData.fax)) newErrors.fax = "Enter a valid fax number (6-15 digits)";
     if (!formData.email.trim()) newErrors.email = "E-mail is required";
     else if (!emailRegex.test(formData.email)) newErrors.email = "Enter a valid email address";
 
@@ -65,10 +67,16 @@ export default function AddFixedAssetsLocations() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validate()) {
-      console.log("Submitted Location:", formData);
-      alert("Fixed Assets Location added successfully!");
+      try {
+        await createLocation(formData);
+        alert("Fixed Assets Location added successfully!");
+        navigate("/fixedassets/maintenance/fixed-asset-locations");
+      } catch (error) {
+        console.error("Add failed", error);
+        alert("Failed to add location.");
+      }
     }
   };
 
@@ -83,11 +91,11 @@ export default function AddFixedAssetsLocations() {
           {([
             { label: "Location Code", field: "locationCode" },
             { label: "Location Name", field: "locationName" },
-            { label: "Contact for Deliveries", field: "contactDeliveries" },
+            { label: "Contact for Deliveries", field: "contact" },
             { label: "Address", field: "address" },
-            { label: "Telephone Number", field: "telNumber" },
-            { label: "Secondary Telephone Number", field: "secondaryTelNumber" },
-            { label: "Facsimile No.", field: "faxNumber" },
+            { label: "Telephone Number", field: "phone" },
+            { label: "Secondary Telephone Number", field: "secondaryPhone" },
+            { label: "Facsimile No.", field: "fax" },
             { label: "E-mail", field: "email" },
           ] as const).map(({ label, field }) => (
             <TextField

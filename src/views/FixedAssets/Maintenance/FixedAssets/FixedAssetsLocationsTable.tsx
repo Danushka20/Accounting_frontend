@@ -26,28 +26,7 @@ import Breadcrumb from "../../../../components/BreadCrumb";
 import PageTitle from "../../../../components/PageTitle";
 import theme from "../../../../theme";
 import SearchBar from "../../../../components/SearchBar";
-
-// Mock API
-const getLocations = async () => [
-  {
-    id: 1,
-    locationCode: "LOC001",
-    locationName: "Main Warehouse",
-    address: "123 Main St, Colombo",
-    phone: "0112345678",
-    secondaryPhone: "0118765432",
-    inactive: false,
-  },
-  {
-    id: 2,
-    locationCode: "LOC002",
-    locationName: "Secondary Warehouse",
-    address: "456 Secondary St, Kandy",
-    phone: "0812345678",
-    secondaryPhone: "",
-    inactive: true,
-  },
-];
+import { getLocations, deleteLocation } from "../../../../api/FixedAssetsLocation/FixedAssetsLocationApi";
 
 export default function FixedAssetsLocationsTable() {
   const [page, setPage] = useState(0);
@@ -59,8 +38,17 @@ export default function FixedAssetsLocationsTable() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    getLocations().then((data) => setLocations(data));
+    loadLocations();
   }, []);
+
+  const loadLocations = async () => {
+    try {
+      const data = await getLocations();
+      setLocations(data);
+    } catch (error) {
+      console.error("Failed to fetch locations", error);
+    }
+  };
 
   const filteredData = useMemo(() => {
     let data = showInactive ? locations : locations.filter((l) => !l.inactive);
@@ -94,8 +82,17 @@ export default function FixedAssetsLocationsTable() {
     setPage(0);
   };
 
-  const handleDelete = (id: number) => {
-    alert(`Delete location with id: ${id}`);
+  const handleDelete = async (id: number) => {
+    if (window.confirm("Are you sure you want to delete this location?")) {
+      try {
+        await deleteLocation(id);
+        loadLocations();
+        alert("Location deleted successfully!");
+      } catch (error) {
+        console.error("Delete failed", error);
+        alert("Failed to delete location.");
+      }
+    }
   };
 
   const breadcrumbItems = [
@@ -105,6 +102,7 @@ export default function FixedAssetsLocationsTable() {
 
   return (
     <Stack>
+      {/* header and actions */}
       <Box
         sx={{
           padding: theme.spacing(2),
@@ -134,7 +132,7 @@ export default function FixedAssetsLocationsTable() {
           <Button
             variant="outlined"
             startIcon={<ArrowBackIcon />}
-            onClick={() => navigate("/fixedassets/maintenance/fixed-asset-locations")}
+            onClick={() => navigate("/fixedassets/maintenance")}
           >
             Back
           </Button>
@@ -163,6 +161,7 @@ export default function FixedAssetsLocationsTable() {
         </Box>
       </Stack>
 
+      {/* Table */}
       <Stack sx={{ alignItems: "center" }}>
         <TableContainer component={Paper} elevation={2} sx={{ overflowX: "auto", maxWidth: isMobile ? "88vw" : "100%" }}>
           <Table aria-label="fixed assets locations table">

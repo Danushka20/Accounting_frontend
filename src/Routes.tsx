@@ -706,7 +706,7 @@ const AppRoutes = () => {
         element={withLayout(MainLayout, AddSalesPricingForm)}
       />
       <Route
-        path="/itemsandinventory/maintenance/items/update-sales-pricing"
+        path="/itemsandinventory/maintenance/items/update-sales-pricing/:id"
         element={withLayout(MainLayout, UpdateSalesPricingForm)}
       />
       <Route
@@ -847,7 +847,7 @@ const AppRoutes = () => {
         element={withLayout(MainLayout, AddFixedAssetsLocations)}
       />
       <Route
-        path="/fixedassets/maintenance/update-fixed-asset-location"
+        path="/fixedassets/maintenance/update-fixed-asset-location/:id"
         element={withLayout(MainLayout, UpdateFixedAssetsLocations)}
       />
 
@@ -872,7 +872,7 @@ const AppRoutes = () => {
         element={withLayout(MainLayout, AddDimensionTagsForm)}
       />
       <Route
-        path="/dimension/maintenance/update-dimension-tags"
+        path="/dimension/maintenance/update-dimension-tags/:id"
         element={withLayout(MainLayout, UpdateDimensionTagsForm)}
       />
 

@@ -24,6 +24,7 @@ import theme from "../../../../../theme";
 import Breadcrumb from "../../../../../components/BreadCrumb";
 import PageTitle from "../../../../../components/PageTitle";
 import SearchBar from "../../../../../components/SearchBar";
+import { getSalesPricing, deleteSalesPricing } from "../../../../../api/SalesPricing/SalesPricingApi";
 
 interface SalesPricing {
     id: number;
@@ -40,27 +41,29 @@ function SalesPricingTable() {
     const navigate = useNavigate();
     const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
 
-    // Dummy data
     useEffect(() => {
-        const dummyData: SalesPricing[] = [
-            { id: 1, currency: "USD", salesType: "Retail", price: 50 },
-            { id: 2, currency: "USD", salesType: "Wholesale", price: 45 },
-            { id: 3, currency: "EUR", salesType: "Retail", price: 55 },
-            { id: 4, currency: "EUR", salesType: "Wholesale", price: 50 },
-            { id: 5, currency: "LKR", salesType: "Retail", price: 12000 },
-            { id: 6, currency: "LKR", salesType: "Wholesale", price: 11000 },
-        ];
-        setSalesData(dummyData);
+        const fetchData = async () => {
+            try {
+                const data = await getSalesPricing();
+                const mappedData = data.map((item: any) => ({
+                    id: item.id,
+                    currency: item.currency.currency_abbreviation,
+                    salesType: item.sales_type.typeName,
+                    price: item.price,
+                }));
+                setSalesData(mappedData);
+            } catch (error) {
+                console.error("Failed to fetch sales pricing:", error);
+            }
+        };
+        fetchData();
     }, []);
 
-    // Filter by search
     const filteredData = useMemo(() => {
-        return salesData.filter((item) => {
-            return (
-                item.salesType.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                item.price.toString().includes(searchQuery)
-            );
-        });
+        return salesData.filter((item) =>
+            item.salesType.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.price.toString().includes(searchQuery)
+        );
     }, [salesData, searchQuery]);
 
     const paginatedData = useMemo(() => {
@@ -74,9 +77,15 @@ function SalesPricingTable() {
         setPage(0);
     };
 
-    const handleDelete = (id: number) => {
+    const handleDelete = async (id: number) => {
         if (window.confirm("Are you sure you want to delete this entry?")) {
-            setSalesData((prev) => prev.filter((item) => item.id !== id));
+            try {
+                await deleteSalesPricing(id);
+                setSalesData((prev) => prev.filter((item) => item.id !== id));
+            } catch (error) {
+                console.error("Failed to delete sales pricing:", error);
+                alert("Failed to delete. Please try again.");
+            }
         }
     };
 
@@ -88,62 +97,32 @@ function SalesPricingTable() {
     return (
         <Stack spacing={2}>
             {/* Header */}
-            <Box
-                sx={{
-                    padding: theme.spacing(2),
-                    boxShadow: 2,
-                    marginY: 2,
-                    borderRadius: 1,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                }}
-            >
+            <Box sx={{ padding: theme.spacing(2), boxShadow: 2, marginY: 2, borderRadius: 1, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <Box>
                     <PageTitle title="Sales Pricing" />
                     <Breadcrumb breadcrumbs={breadcrumbItems} />
                 </Box>
 
                 <Stack direction="row" spacing={1}>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={() => navigate("/itemsandinventory/maintenance/items/add-sales-pricing")}
-                    >
+                    <Button variant="contained" color="primary" onClick={() => navigate("/itemsandinventory/maintenance/items/add-sales-pricing")}>
                         Add Sales Pricing
                     </Button>
-
-                    <Button
-                        variant="outlined"
-                        startIcon={<ArrowBackIcon />}
-                        onClick={() => navigate("/itemsandinventory/maintenance/items")}
-                    >
+                    <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={() => navigate("/itemsandinventory/maintenance/items")}>
                         Back
                     </Button>
                 </Stack>
             </Box>
 
             {/* Search */}
-            <Stack
-                direction="row"
-                sx={{ px: 2, mb: 2, width: "100%", justifyContent: "flex-end" }}
-            >
+            <Stack direction="row" sx={{ px: 2, mb: 2, width: "100%", justifyContent: "flex-end" }}>
                 <Box sx={{ width: isMobile ? "100%" : "300px" }}>
-                    <SearchBar
-                        searchQuery={searchQuery}
-                        setSearchQuery={setSearchQuery}
-                        placeholder="Search Sales Type or Price..."
-                    />
+                    <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} placeholder="Search Sales Type or Price..." />
                 </Box>
             </Stack>
 
             {/* Table */}
             <Stack sx={{ alignItems: "center" }}>
-                <TableContainer
-                    component={Paper}
-                    elevation={2}
-                    sx={{ overflowX: "auto", maxWidth: isMobile ? "88vw" : "100%" }}
-                >
+                <TableContainer component={Paper} elevation={2} sx={{ overflowX: "auto", maxWidth: isMobile ? "88vw" : "100%" }}>
                     <Table aria-label="sales pricing table">
                         <TableHead sx={{ backgroundColor: "var(--pallet-lighter-blue)" }}>
                             <TableRow>
@@ -165,18 +144,10 @@ function SalesPricingTable() {
                                         <TableCell>{item.price}</TableCell>
                                         <TableCell align="center">
                                             <Stack direction="row" spacing={1} justifyContent="center">
-                                                <Button variant="contained" size="small" startIcon={<EditIcon />}
-                                                 onClick={() => navigate(`/itemsandinventory/maintenance/items/update-sales-pricing/${item.id}`)}
-                                                 >
+                                                <Button variant="contained" size="small" startIcon={<EditIcon />} onClick={() => navigate(`/itemsandinventory/maintenance/items/update-sales-pricing/${item.id}`)}>
                                                     Edit
                                                 </Button>
-                                                <Button
-                                                    variant="outlined"
-                                                    size="small"
-                                                    color="error"
-                                                    startIcon={<DeleteIcon />}
-                                                    onClick={() => handleDelete(item.id)}
-                                                >
+                                                <Button variant="outlined" size="small" color="error" startIcon={<DeleteIcon />} onClick={() => handleDelete(item.id)}>
                                                     Delete
                                                 </Button>
                                             </Stack>
